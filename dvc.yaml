@@ -1,0 +1,52 @@
+stages:
+  # Stage 1: Data Collection
+  data_collection:
+    cmd: python src/data_collection/collect_all.py
+    deps:
+      - src/data_collection/collect_all.py
+      - src/data_collection/reddit_collector.py
+      - src/data_collection/kaggle_downloader.py
+      - src/utils/config.py
+      - src/utils/logger.py
+      - src/utils/helpers.py
+    params:
+      - data_collection
+    outs:
+      - data/raw/reddit_reviews.csv
+      - data/raw/kaggle_imdb.csv
+      - data/raw/collection_metadata.json
+    metrics:
+      - data/raw/collection_stats.json:
+          cache: false
+
+  # Stage 2: Data Validation
+  data_validation:
+    cmd: python src/preprocessing/validate_data.py
+    deps:
+      - src/preprocessing/validate_data.py
+      - data/raw/reddit_reviews.csv
+      - data/raw/kaggle_imdb.csv
+    outs:
+      - data/raw/validated_data.csv
+    metrics:
+      - data/raw/validation_report.json:
+          cache: false
+
+  # Stage 3: Data Preprocessing
+  preprocessing:
+    cmd: python src/preprocessing/preprocess.py
+    deps:
+      - src/preprocessing/preprocess.py
+      - src/preprocessing/text_cleaner.py
+      - data/raw/validated_data.csv
+    params:
+      - preprocessing
+    outs:
+      - data/processed/train.csv
+      - data/processed/validation.csv
+      - data/processed/test.csv
+      - data/processed/tfidf_vectorizer.pkl
+      - data/processed/label_encoder.pkl
+    metrics:
+      - data/processed/preprocessing_stats.json:
+          cache: false
