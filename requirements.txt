@@ -24,19 +24,19 @@ xgboost==2.0.3
 # Deep Learning
 torch==2.1.1
 transformers==4.35.2
-datasets==2.15.0
+datasets==3.1.0
 accelerate==0.25.0
 
 # MLOps
 mlflow==2.8.1
-dvc==3.30.0
-dvc[s3]==3.30.0
+dvc==3.63.0
+dvc[s3]==3.63.0
 
 # API & Web
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
 streamlit==1.28.2
-pydantic==2.5.0
+pydantic==2.12.3
 python-multipart==0.0.6
 
 # Monitoring

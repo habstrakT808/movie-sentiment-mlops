@@ -10,9 +10,9 @@
 | --- | --- | --- | --- |
 | 1.0 | 2024 | MLOps Team | Initial Documentation |
 
-**Project Duration:** 4 Weeks (1 Month)  
+**Project Duration:** 4 Weeks (1 Month)
 
-**Budget:** $0 (100% Free Tools)  
+**Budget:** $0 (100% Free Tools)
 
 **Deployment:** Local Docker Environment
 
@@ -38,7 +38,7 @@
 
 ## 1.1 Project Overview
 
-**Project Name:** Movie Sentiment Analysis MLOps Pipeline  
+**Project Name:** Movie Sentiment Analysis MLOps Pipeline
 
 **Objective:** Build an end-to-end MLOps system for analyzing movie review sentiments with automated data collection, model training, deployment, and monitoring.
 
@@ -552,7 +552,7 @@ stages:
       - data/raw/kaggle_imdb.csv
     metrics:
       - data/raw/collection_stats.json
-  
+
   data_validation:
     cmd: python src/preprocessing/validate_data.py
     deps:
@@ -562,7 +562,7 @@ stages:
       - data/validated/
     metrics:
       - data/validated/validation_report.json
-  
+
   preprocessing:
     cmd: python src/preprocessing/preprocess.py
     deps:
@@ -586,7 +586,7 @@ stages:
 
 ## **PHASE 1: PROJECT SETUP & DATA COLLECTION**
 
-**Duration:** Week 1 (Days 1-7)  
+**Duration:** Week 1 (Days 1-7)
 
 **Effort:** 15-20 hours
 
@@ -746,14 +746,14 @@ class RedditCollector:
         # Initialize PRAW client
         # Load movie list
         # Initialize rate limiter
-    
+
     def collect_movie_reviews(self, movie_title, limit=1000):
         # Search subreddits
         # Extract posts and comments
         # Apply rate limiting
         # Validate data
         # Save to CSV
-    
+
     def collect_balanced_dataset(self):
         # Loop through positive/negative/neutral movies
         # Balance collection across sentiments
@@ -954,7 +954,7 @@ Please provide complete implementation with comments.
 
 ## **PHASE 2: DATA PREPROCESSING & EDA**
 
-**Duration:** Week 1-2 (Days 8-10)  
+**Duration:** Week 1-2 (Days 8-10)
 
 **Effort:** 10-12 hours
 
@@ -1047,31 +1047,31 @@ df.groupby(df['timestamp'].dt.year)['sentiment'].value_counts()
 class TextPreprocessor:
     def __init__(self):
         self.nlp = spacy.load("en_core_web_sm")
-    
+
     def clean_text(self, text):
         # 1. Lowercase
         text = text.lower()
-        
+
         # 2. Remove URLs
         text = re.sub(r'http\S+|www\S+', '', text)
-        
+
         # 3. Remove HTML tags
         text = BeautifulSoup(text, "html.parser").get_text()
-        
+
         # 4. Remove special characters (keep punctuation for sentiment)
         text = re.sub(r'[^a-zA-Z0-9\s.,!?]', '', text)
-        
+
         # 5. Remove extra whitespace
         text = ' '.join(text.split())
-        
+
         return text
-    
+
     def tokenize(self, text):
         # Tokenization with spaCy
         doc = self.nlp(text)
         tokens = [token.text for token in doc]
         return tokens
-    
+
     def lemmatize(self, text):
         # Lemmatization
         doc = self.nlp(text)
@@ -1111,20 +1111,20 @@ class FeatureEngineer:
         df['text_length'] = df['text_cleaned'].str.len()
         df['word_count'] = df['text_cleaned'].str.split().str.len()
         df['avg_word_length'] = df['text_length'] / df['word_count']
-        
+
         # 2. Punctuation features
         df['exclamation_count'] = df['text'].str.count('!')
         df['question_count'] = df['text'].str.count('\?')
         df['caps_ratio'] = df['text'].apply(lambda x: sum(1 for c in x if c.isupper()) / len(x))
-        
+
         # 3. Sentiment lexicon features
         df['positive_word_count'] = df['text_cleaned'].apply(self.count_positive_words)
         df['negative_word_count'] = df['text_cleaned'].apply(self.count_negative_words)
-        
+
         # 4. TF-IDF features (for traditional ML)
         tfidf_vectorizer = TfidfVectorizer(max_features=5000)
         tfidf_matrix = tfidf_vectorizer.fit_transform(df['text_cleaned'])
-        
+
         return df, tfidf_matrix, tfidf_vectorizer
 ```
 
@@ -1157,15 +1157,15 @@ class FeatureEngineer:
 def split_data(df, train_size=0.7, val_size=0.15, test_size=0.15):
     # Stratified split to maintain class balance
     from sklearn.model_selection import train_test_split
-    
+
     # First split: train + (val+test)
     train_df, temp_df = train_test_split(
-        df, 
+        df,
         test_size=(val_size + test_size),
         stratify=df['sentiment'],
         random_state=42
     )
-    
+
     # Second split: val + test
     val_df, test_df = train_test_split(
         temp_df,
@@ -1173,7 +1173,7 @@ def split_data(df, train_size=0.7, val_size=0.15, test_size=0.15):
         stratify=temp_df['sentiment'],
         random_state=42
     )
-    
+
     return train_df, val_df, test_df
 ```
 
@@ -1205,7 +1205,7 @@ def split_data(df, train_size=0.7, val_size=0.15, test_size=0.15):
 ```yaml
 stages:
   # ... (previous stages)
-  
+
   preprocessing:
     cmd: python src/preprocessing/preprocess.py
     deps:
@@ -1259,7 +1259,7 @@ stages:
 
 ## **PHASE 3: MODEL DEVELOPMENT & TRAINING**
 
-**Duration:** Week 2-3 (Days 11-17)  
+**Duration:** Week 2-3 (Days 11-17)
 
 **Effort:** 20-25 hours
 
@@ -1308,7 +1308,7 @@ class TraditionalMLTrainer:
             'random_forest': RandomForestClassifier(),
             'svm': SVC()
         }
-    
+
     def train_logistic_regression(self, X_train, y_train, X_val, y_val):
         with mlflow.start_run(run_name="logistic_regression"):
             # Hyperparameter grid
@@ -1317,7 +1317,7 @@ class TraditionalMLTrainer:
                 'penalty': ['l1', 'l2'],
                 'solver': ['liblinear', 'saga']
             }
-            
+
             # Grid search
             grid_search = GridSearchCV(
                 LogisticRegression(max_iter=1000),
@@ -1326,17 +1326,17 @@ class TraditionalMLTrainer:
                 scoring='f1_weighted',
                 n_jobs=-1
             )
-            
+
             grid_search.fit(X_train, y_train)
             best_model = grid_search.best_estimator_
-            
+
             # Evaluate
             train_score = best_model.score(X_train, y_train)
             val_score = best_model.score(X_val, y_val)
-            
+
             # Predictions
             y_pred = best_model.predict(X_val)
-            
+
             # Metrics
             metrics = {
                 'accuracy': accuracy_score(y_val, y_pred),
@@ -1344,22 +1344,22 @@ class TraditionalMLTrainer:
                 'recall': recall_score(y_val, y_pred, average='weighted'),
                 'f1': f1_score(y_val, y_pred, average='weighted')
             }
-            
+
             # Log to MLflow
             mlflow.log_params(grid_search.best_params_)
             mlflow.log_metrics(metrics)
             mlflow.log_metric("train_accuracy", train_score)
             mlflow.log_metric("val_accuracy", val_score)
-            
+
             # Confusion matrix
             cm = confusion_matrix(y_val, y_pred)
             self.log_confusion_matrix(cm)
-            
+
             # Save model
             mlflow.sklearn.log_model(best_model, "model")
-            
+
             return best_model, metrics
-    
+
     def train_random_forest(self, X_train, y_train, X_val, y_val):
         # Similar structure with RF-specific hyperparameters
         param_grid = {
@@ -1369,7 +1369,7 @@ class TraditionalMLTrainer:
             'min_samples_leaf': [1, 2, 4]
         }
         # ... (similar to logistic regression)
-    
+
     def train_svm(self, X_train, y_train, X_val, y_val):
         # Similar structure with SVM-specific hyperparameters
         param_grid = {
@@ -1416,14 +1416,14 @@ class SentimentDataset(torch.utils.data.Dataset):
         self.labels = labels
         self.tokenizer = tokenizer
         self.max_length = max_length
-    
+
     def __len__(self):
         return len(self.texts)
-    
+
     def __getitem__(self, idx):
         text = self.texts[idx]
         label = self.labels[idx]
-        
+
         encoding = self.tokenizer(
             text,
             max_length=self.max_length,
@@ -1431,7 +1431,7 @@ class SentimentDataset(torch.utils.data.Dataset):
             truncation=True,
             return_tensors='pt'
         )
-        
+
         return {
             'input_ids': encoding['input_ids'].flatten(),
             'attention_mask': encoding['attention_mask'].flatten(),
@@ -1443,7 +1443,7 @@ class TransformerTrainer:
         self.model_name = model_name
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         mlflow.set_experiment("movie_sentiment_transformer")
-    
+
     def train(self, train_df, val_df, epochs=3, batch_size=16, learning_rate=2e-5):
         with mlflow.start_run(run_name=f"distilbert_epochs_{epochs}"):
             # Load pre-trained model
@@ -1451,20 +1451,20 @@ class TransformerTrainer:
                 self.model_name,
                 num_labels=3
             )
-            
+
             # Create datasets
             train_dataset = SentimentDataset(
                 train_df['text_cleaned'].values,
                 train_df['sentiment_encoded'].values,
                 self.tokenizer
             )
-            
+
             val_dataset = SentimentDataset(
                 val_df['text_cleaned'].values,
                 val_df['sentiment_encoded'].values,
                 self.tokenizer
             )
-            
+
             # Training arguments
             training_args = TrainingArguments(
                 output_dir='./models/distilbert_checkpoints',
@@ -1481,7 +1481,7 @@ class TransformerTrainer:
                 load_best_model_at_end=True,
                 metric_for_best_model="f1",
             )
-            
+
             # Trainer
             trainer = Trainer(
                 model=model,
@@ -1490,13 +1490,13 @@ class TransformerTrainer:
                 eval_dataset=val_dataset,
                 compute_metrics=self.compute_metrics
             )
-            
+
             # Train
             trainer.train()
-            
+
             # Evaluate
             eval_results = trainer.evaluate()
-            
+
             # Log to MLflow
             mlflow.log_params({
                 'model_name': self.model_name,
@@ -1505,19 +1505,19 @@ class TransformerTrainer:
                 'learning_rate': learning_rate
             })
             mlflow.log_metrics(eval_results)
-            
+
             # Save model
             mlflow.transformers.log_model(
                 transformers_model={"model": model, "tokenizer": self.tokenizer},
                 artifact_path="model"
             )
-            
+
             return model, eval_results
-    
+
     def compute_metrics(self, eval_pred):
         predictions, labels = eval_pred
         predictions = np.argmax(predictions, axis=1)
-        
+
         return {
             'accuracy': accuracy_score(labels, predictions),
             'precision': precision_score(labels, predictions, average='weighted'),
@@ -1565,7 +1565,7 @@ class ModelEvaluator:
     def evaluate_model(self, model, X_test, y_test, model_name):
         # Predictions
         y_pred = model.predict(X_test)
-        
+
         # Metrics
         metrics = {
             'accuracy': accuracy_score(y_test, y_pred),
@@ -1574,19 +1574,19 @@ class ModelEvaluator:
             'f1': f1_score(y_test, y_pred, average='weighted'),
             'cohen_kappa': cohen_kappa_score(y_test, y_pred)
         }
-        
+
         # Per-class metrics
         class_report = classification_report(y_test, y_pred, output_dict=True)
-        
+
         # Confusion matrix
         cm = confusion_matrix(y_test, y_pred)
-        
+
         # ROC-AUC (if applicable)
         if hasattr(model, 'predict_proba'):
             y_proba = model.predict_proba(X_test)
             roc_auc = roc_auc_score(y_test, y_proba, multi_class='ovr')
             metrics['roc_auc'] = roc_auc
-        
+
         # Generate report
         report = {
             'model_name': model_name,
@@ -1594,9 +1594,9 @@ class ModelEvaluator:
             'class_report': class_report,
             'confusion_matrix': cm.tolist()
         }
-        
+
         return report
-    
+
     def compare_models(self, model_reports):
         # Create comparison DataFrame
         comparison_df = pd.DataFrame([
@@ -1606,17 +1606,17 @@ class ModelEvaluator:
             }
             for report in model_reports
         ])
-        
+
         # Visualize comparison
         self.plot_model_comparison(comparison_df)
-        
+
         return comparison_df
-    
+
     def error_analysis(self, model, X_test, y_test, texts):
         # Identify misclassified examples
         y_pred = model.predict(X_test)
         misclassified_idx = np.where(y_test != y_pred)[0]
-        
+
         # Analyze patterns in errors
         error_analysis = []
         for idx in misclassified_idx[:50]:  # Top 50 errors
@@ -1626,7 +1626,7 @@ class ModelEvaluator:
                 'predicted_label': y_pred[idx],
                 'confidence': max(model.predict_proba([X_test[idx]])[0]) if hasattr(model, 'predict_proba') else None
             })
-        
+
         return pd.DataFrame(error_analysis)
 ```
 
@@ -1662,10 +1662,10 @@ class ModelRegistry:
     def register_model(self, run_id, model_name, stage="Staging"):
         # Get model URI from run
         model_uri = f"runs:/{run_id}/model"
-        
+
         # Register model
         registered_model = mlflow.register_model(model_uri, model_name)
-        
+
         # Transition to stage
         client = mlflow.tracking.MlflowClient()
         client.transition_model_version_stage(
@@ -1673,12 +1673,12 @@ class ModelRegistry:
             version=registered_model.version,
             stage=stage
         )
-        
+
         return registered_model
-    
+
     def promote_to_production(self, model_name, version):
         client = mlflow.tracking.MlflowClient()
-        
+
         # Archive current production model
         current_production = client.get_latest_versions(model_name, stages=["Production"])
         for model_version in current_production:
@@ -1687,7 +1687,7 @@ class ModelRegistry:
                 version=model_version.version,
                 stage="Archived"
             )
-        
+
         # Promote new model
         client.transition_model_version_stage(
             name=model_name,
@@ -1736,7 +1736,7 @@ class ModelRegistry:
 
 ## **PHASE 4: CI/CD PIPELINE SETUP**
 
-**Duration:** Week 3 (Days 18-21)  
+**Duration:** Week 3 (Days 18-21)
 
 **Effort:** 12-15 hours
 
@@ -1782,28 +1782,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-      
+
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
           pip install flake8 black pytest pytest-cov
-      
+
       - name: Lint with flake8
         run: |
           flake8 src/ --count --select=E9,F63,F7,F82 --show-source --statistics
           flake8 src/ --count --max-complexity=10 --max-line-length=127 --statistics
-      
+
       - name: Format check with black
         run: black --check src/
-      
+
       - name: Run unit tests
         run: pytest tests/unit/ -v --cov=src --cov-report=xml
-      
+
       - name: Upload coverage
         uses: codecov/codecov-action@v3
         with:
@@ -1814,15 +1814,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-      
+
       - name: Install dependencies
         run: pip install -r requirements.txt
-      
+
       - name: Run integration tests
         run: pytest tests/integration/ -v
 ```
@@ -1859,38 +1859,38 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-      
+
       - name: Install dependencies
         run: pip install -r requirements.txt
-      
+
       - name: Set up DVC
         run: |
           pip install dvc
           dvc remote modify local --local url /tmp/dvc-storage
-      
+
       - name: Pull latest data
         run: dvc pull
-      
+
       - name: Collect new data
         env:
           REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
           REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
           REDDIT_USER_AGENT: ${{ secrets.REDDIT_USER_AGENT }}
         run: python src/data_collection/collect_new_data.py
-      
+
       - name: Validate new data
         run: python src/preprocessing/validate_data.py
-      
+
       - name: Update DVC
         run: |
           dvc add data/raw/
           dvc push
-      
+
       - name: Commit changes
         run: |
           git config --local user.email "action@github.com"
@@ -1943,32 +1943,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-      
+
       - name: Install dependencies
         run: pip install -r requirements.txt
-      
+
       - name: Pull latest data
         run: dvc pull
-      
+
       - name: Train models
         run: |
           python src/training/train_pipeline.py --model-type ${{ github.event.inputs.model_type || 'all' }}
-      
+
       - name: Evaluate models
         run: python src/models/model_evaluator.py
-      
+
       - name: Check model performance
         run: python src/training/performance_gate.py
-      
+
       - name: Register model
         if: success()
         run: python src/models/model_registry.py --stage Staging
-      
+
       - name: Notify on failure
         if: failure()
         uses: actions/github-script@v6
@@ -1996,11 +1996,11 @@ def check_performance_gate(metrics, thresholds):
         'f1': metrics['f1'] >= thresholds['min_f1'],
         'precision': metrics['precision'] >= thresholds['min_precision']
     }
-    
+
     if not all(gates.values()):
         failed_gates = [k for k, v in gates.items() if not v]
         raise ValueError(f"Performance gate failed for: {failed_gates}")
-    
+
     return True
 
 # Thresholds
@@ -2046,30 +2046,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      
+
       - name: Build API Docker image
         run: |
           docker build -t movie-sentiment-api:latest -f docker/Dockerfile.api .
-      
+
       - name: Build Dashboard Docker image
         run: |
           docker build -t movie-sentiment-dashboard:latest -f docker/Dockerfile.dashboard .
-      
+
       - name: Test containers
         run: |
           docker-compose -f docker/docker-compose.test.yml up -d
           sleep 10
           curl -f http://localhost:8000/health || exit 1
           docker-compose -f docker/docker-compose.test.yml down
-      
+
       - name: Save Docker images
         run: |
           docker save movie-sentiment-api:latest | gzip > api-image.tar.gz
           docker save movie-sentiment-dashboard:latest | gzip > dashboard-image.tar.gz
-      
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -2107,7 +2107,7 @@ jobs:
 
 ## **PHASE 5: CONTAINERIZATION & DEPLOYMENT**
 
-**Duration:** Week 3-4 (Days 22-25)  
+**Duration:** Week 3-4 (Days 22-25)
 
 **Effort:** 12-15 hours
 
@@ -2166,20 +2166,20 @@ async def predict(request: PredictionRequest):
     with prediction_latency.time():
         # Select model
         model = app.state.transformer_model if request.model_type == "transformer" else app.state.traditional_model
-        
+
         # Preprocess
         preprocessed_text = preprocess_text(request.text)
-        
+
         # Predict
         prediction = model.predict([preprocessed_text])
         confidence = model.predict_proba([preprocessed_text]).max()
-        
+
         # Map to sentiment
         sentiment_map = {0: "negative", 1: "neutral", 2: "positive"}
         sentiment = sentiment_map[prediction[0]]
-        
+
         prediction_counter.inc()
-        
+
         return PredictionResponse(
             sentiment=sentiment,
             confidence=float(confidence),
@@ -2259,11 +2259,11 @@ page = st.sidebar.radio("Navigation", ["Predict", "Model Performance", "Data Ins
 
 if page == "Predict":
     st.title("Movie Review Sentiment Prediction")
-    
+
     # Input
     review_text = st.text_area("Enter movie review:", height=200)
     model_type = st.selectbox("Select Model:", ["transformer", "traditional"])
-    
+
     if st.button("Predict Sentiment"):
         if review_text:
             # Call API
@@ -2271,20 +2271,20 @@ if page == "Predict":
                 "http://api:8000/predict",
                 json={"text": review_text, "model_type": model_type}
             )
-            
+
             if response.status_code == 200:
                 result = response.json()
-                
+
                 # Display result
                 sentiment = result['sentiment']
                 confidence = result['confidence']
-                
+
                 col1, col2 = st.columns(2)
                 with col1:
                     st.metric("Sentiment", sentiment.upper())
                 with col2:
                     st.metric("Confidence", f"{confidence:.2%}")
-                
+
                 # Visualization
                 if sentiment == "positive":
                     st.success("Positive Review! 😊")
@@ -2295,31 +2295,31 @@ if page == "Predict":
 
 elif page == "Model Performance":
     st.title("Model Performance Dashboard")
-    
+
     # Load MLflow experiments
     client = mlflow.tracking.MlflowClient()
     experiments = client.list_experiments()
-    
+
     # Display metrics
     st.subheader("Model Comparison")
-    
+
     # Create comparison table
     # ... (fetch from MLflow)
-    
+
     # Visualizations
     st.subheader("Performance Metrics Over Time")
     # ... (plot metrics)
 
 elif page == "Data Insights":
     st.title("Data Insights")
-    
+
     # Load data statistics
     # ... (from DVC or database)
-    
+
     # Visualizations
     st.subheader("Sentiment Distribution")
     # ... (pie chart)
-    
+
     st.subheader("Word Clouds")
     # ... (word clouds for each sentiment)
 ```
@@ -2542,7 +2542,7 @@ echo "Grafana: http://localhost:3000"
 
 ## **PHASE 6: MONITORING & CONTINUOUS LEARNING**
 
-**Duration:** Week 4 (Days 26-28)  
+**Duration:** Week 4 (Days 26-28)
 
 **Effort:** 10-12 hours
 
@@ -2699,7 +2699,7 @@ class DataDriftDetector:
     def __init__(self, reference_data):
         self.reference_data = reference_data
         self.reference_stats = self.compute_statistics(reference_data)
-    
+
     def compute_statistics(self, data):
         return {
             'text_length_mean': data['text_length'].mean(),
@@ -2708,30 +2708,30 @@ class DataDriftDetector:
             'word_count_std': data['word_count'].std(),
             'sentiment_distribution': data['sentiment'].value_counts(normalize=True)
         }
-    
+
     def detect_drift(self, new_data):
         # Statistical tests
         drift_scores = {}
-        
+
         # KS test for text length
         ks_stat, p_value = ks_2samp(
             self.reference_data['text_length'],
             new_data['text_length']
         )
         drift_scores['text_length_drift'] = ks_stat
-        
+
         # Chi-square test for sentiment distribution
         # ... (implementation)
-        
+
         # Overall drift score
         overall_drift = np.mean(list(drift_scores.values()))
-        
+
         # Alert if drift detected
         if overall_drift > 0.1:  # threshold
             self.trigger_alert(drift_scores)
-        
+
         return drift_scores
-    
+
     def trigger_alert(self, drift_scores):
         # Log alert
         # Send notification
@@ -2764,7 +2764,7 @@ class ContinuousLearner:
     def __init__(self):
         self.feedback_buffer = []
         self.retrain_threshold = 1000  # New samples needed
-    
+
     def collect_feedback(self, prediction_id, true_label):
         # Store feedback
         self.feedback_buffer.append({
@@ -2772,11 +2772,11 @@ class ContinuousLearner:
             'true_label': true_label,
             'timestamp': datetime.now()
         })
-        
+
         # Check if retraining needed
         if len(self.feedback_buffer) >= self.retrain_threshold:
             self.trigger_retraining()
-    
+
     def trigger_retraining(self):
         # Add new data to training set
         # Trigger model training pipeline
@@ -2813,7 +2813,7 @@ class ContinuousLearner:
 
 ## **PHASE 7: COMPLIANCE & DOCUMENTATION**
 
-**Duration:** Week 4 (Days 29-30)  
+**Duration:** Week 4 (Days 29-30)
 
 **Effort:** 6-8 hours
 
@@ -2845,7 +2845,7 @@ class PrivacyManager:
         # Remove usernames
         # Hash identifiers
         pass
-    
+
     def gdpr_compliance(self):
         # Right to be forgotten
         # Data portability
