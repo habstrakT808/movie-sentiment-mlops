@@ -1,0 +1,108 @@
+# MLflow Configuration
+
+tracking:
+  uri: "sqlite:///mlflow.db"
+  artifact_location: "./mlruns"
+
+experiments:
+  # Main experiment for all models
+  main:
+    name: "movie_sentiment_analysis"
+    description: "Movie review sentiment analysis with traditional ML and transformers"
+    tags:
+      project: "movie-sentiment-mlops"
+      version: "1.0"
+      team: "mlops-team"
+
+  # Traditional ML experiment
+  traditional_ml:
+    name: "movie_sentiment_traditional_ml"
+    description: "Traditional ML models (Logistic Regression, Random Forest, SVM)"
+    tags:
+      model_type: "traditional_ml"
+      framework: "scikit-learn"
+
+  # Transformer experiment
+  transformer:
+    name: "movie_sentiment_transformer"
+    description: "Transformer models (DistilBERT)"
+    tags:
+      model_type: "transformer"
+      framework: "pytorch"
+
+# Model Registry
+registry:
+  # Model names
+  models:
+    logistic_regression: "sentiment_logistic_regression"
+    random_forest: "sentiment_random_forest"
+    svm: "sentiment_svm"
+    transformer: "sentiment_distilbert"
+
+  # Stages
+  stages:
+    - "None"
+    - "Staging"
+    - "Production"
+    - "Archived"
+
+  # Transition rules
+  transition_rules:
+    to_staging:
+      min_accuracy: 0.80
+      min_f1: 0.78
+    to_production:
+      min_accuracy: 0.85
+      min_f1: 0.83
+      min_precision: 0.82
+
+# Logging configuration
+logging:
+  # What to log
+  log_params: true
+  log_metrics: true
+  log_artifacts: true
+  log_models: true
+  log_system_metrics: true
+
+  # Metrics to track
+  metrics:
+    - accuracy
+    - precision
+    - recall
+    - f1
+    - roc_auc
+    - confusion_matrix
+    - classification_report
+
+  # System metrics
+  system_metrics:
+    - cpu_percent
+    - memory_percent
+    - disk_usage
+
+  # Artifacts to log
+  artifacts:
+    - confusion_matrix.png
+    - roc_curve.png
+    - classification_report.txt
+    - feature_importance.png
+    - training_history.json
+
+# Run configuration
+runs:
+  # Auto-tagging
+  auto_tags:
+    - git_commit
+    - git_branch
+    - user
+    - timestamp
+
+  # Run naming convention
+  naming_pattern: "{model_type}_{timestamp}"
+
+  # Cleanup
+  cleanup:
+    enabled: true
+    keep_last_n_runs: 20
+    cleanup_interval_days: 30
