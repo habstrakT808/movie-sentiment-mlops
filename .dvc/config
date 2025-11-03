@@ -1,4 +1,6 @@
 [core]
-    remote = storage
+    remote = local
 ['remote "storage"']
     url = D:/dvc-storage
+['remote "local"']
+    url = D:/dvc-storage/movie-sentiment-mlops
