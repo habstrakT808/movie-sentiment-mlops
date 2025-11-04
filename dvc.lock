@@ -1,0 +1,91 @@
+schema: '2.0'
+stages:
+  data_collection:
+    cmd: python src/data_collection/collect_all.py
+    deps:
+    - path: src/data_collection/collect_all.py
+      hash: md5
+      md5: 788cdb1b86e636efbbb9d87ecf26dc78
+      size: 6185
+    - path: src/data_collection/kaggle_downloader.py
+      hash: md5
+      md5: 7fa8e2409a647fe561778c9c7a186ed8
+      size: 6396
+    - path: src/data_collection/reddit_collector.py
+      hash: md5
+      md5: 3244bb42fbbba0ec16359cf6b0c45d48
+      size: 15400
+    - path: src/utils/config.py
+      hash: md5
+      md5: 175a0406947f3bbd161824c18bee904b
+      size: 3138
+    - path: src/utils/helpers.py
+      hash: md5
+      md5: 965b27d7f211b61c021d7f612a154e08
+      size: 3663
+    - path: src/utils/logger.py
+      hash: md5
+      md5: df1a01a3c87b31ce0e42c8f118945c6e
+      size: 1061
+    params:
+      params.yaml:
+        data_collection:
+          reddit:
+            subreddits:
+            - movies
+            - MovieReviews
+            - TrueFilm
+            - boxoffice
+            - flicks
+            limit_per_movie: 1000
+            max_comments_per_post: 20
+            min_score: 1
+            rate_limit_delay: 1
+          kaggle:
+            dataset: lakshmi25npathi/imdb-dataset-of-50k-movie-reviews
+            sample_size: 20000
+          target_total_samples: 50000
+          min_review_length: 20
+          max_review_length: 5000
+          positive_movies:
+          - The Shawshank Redemption
+          - The Dark Knight
+          - Inception
+          - Interstellar
+          - Avengers Endgame
+          - Spider-Man No Way Home
+          - Top Gun Maverick
+          - Everything Everywhere All at Once
+          negative_movies:
+          - Cats 2019
+          - The Last Airbender
+          - Dragonball Evolution
+          - Fantastic Four 2015
+          - Batman v Superman
+          - Suicide Squad 2016
+          - Morbius
+          - The Flash 2023
+          neutral_movies:
+          - The Last Jedi
+          - Justice League
+          - Wonder Woman 1984
+          - Eternals
+          - Thor Love and Thunder
+          - Matrix Resurrections
+    outs:
+    - path: data/raw/collection_metadata.json
+      hash: md5
+      md5: 83bbdb5d3aaf55f1f7afa175d562b995
+      size: 2179
+    - path: data/raw/collection_stats.json
+      hash: md5
+      md5: 366dd55a029e3975a7b469e3c3c53220
+      size: 598
+    - path: data/raw/kaggle_imdb.csv
+      hash: md5
+      md5: a3fdf77261f84f70d6cd4e78f5042a62
+      size: 29718188
+    - path: data/raw/reddit_reviews.csv
+      hash: md5
+      md5: be573bfa043f3ec1a81fd84e3c78d25b
+      size: 1121965
