@@ -54,6 +54,7 @@ data_collection:
 
 # Preprocessing Parameters
 preprocessing:
+  classification_type: "binary"
   min_length: 20
   max_length: 5000
   remove_stopwords: false

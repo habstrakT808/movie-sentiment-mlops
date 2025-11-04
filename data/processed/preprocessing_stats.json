@@ -1,0 +1,81 @@
+{
+  "pipeline_steps": [
+    "load_data",
+    "clean_texts",
+    "split_data",
+    "engineer_features",
+    "save_processed_data",
+    "save_artifacts"
+  ],
+  "data_shapes": {
+    "original": [
+      20411,
+      17
+    ],
+    "after_cleaning": [
+      20411,
+      18
+    ],
+    "train": [
+      14191,
+      18
+    ],
+    "val": [
+      3041,
+      18
+    ],
+    "test": [
+      3042,
+      18
+    ]
+  },
+  "class_distributions": {
+    "original": {
+      "negative": 10137,
+      "positive": 10137,
+      "neutral": 137
+    },
+    "train": {
+      "positive": 7096,
+      "negative": 7095
+    },
+    "val": {
+      "negative": 1521,
+      "positive": 1520
+    },
+    "test": {
+      "negative": 1521,
+      "positive": 1521
+    }
+  },
+  "feature_counts": {
+    "statistical": 16,
+    "tfidf": 5000,
+    "total": 5016
+  },
+  "cleaning_stats": {
+    "total_processed": 20411,
+    "urls_removed": 164,
+    "html_removed": 20401,
+    "emails_removed": 0,
+    "mentions_removed": 0,
+    "excessive_spaces_normalized": 20411
+  },
+  "config": {
+    "classification_type": "binary",
+    "min_length": 20,
+    "max_length": 5000,
+    "remove_stopwords": false,
+    "lowercase": true,
+    "remove_urls": true,
+    "remove_html": true,
+    "remove_special_chars": false,
+    "max_features_tfidf": 5000,
+    "train_size": 0.7,
+    "val_size": 0.15,
+    "test_size": 0.15,
+    "random_state": 42,
+    "stratify": true
+  },
+  "completed_steps": 6
+}
