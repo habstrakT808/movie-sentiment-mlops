@@ -5,16 +5,16 @@ stages:
     deps:
     - path: src/data_collection/collect_all.py
       hash: md5
-      md5: 788cdb1b86e636efbbb9d87ecf26dc78
-      size: 6185
+      md5: 61a666ac508ac7dbc5190970da6614b9
+      size: 6167
     - path: src/data_collection/kaggle_downloader.py
       hash: md5
-      md5: 7fa8e2409a647fe561778c9c7a186ed8
-      size: 6396
+      md5: 1050d466dbb8907a0dec4cbdf713293f
+      size: 6392
     - path: src/data_collection/reddit_collector.py
       hash: md5
-      md5: 3244bb42fbbba0ec16359cf6b0c45d48
-      size: 15400
+      md5: 67edb0436382815d7091245ac35d0f67
+      size: 15279
     - path: src/utils/config.py
       hash: md5
       md5: 175a0406947f3bbd161824c18bee904b
@@ -75,17 +75,98 @@ stages:
     outs:
     - path: data/raw/collection_metadata.json
       hash: md5
-      md5: 83bbdb5d3aaf55f1f7afa175d562b995
+      md5: 5148c6903538d35ae4482180dbc22269
       size: 2179
     - path: data/raw/collection_stats.json
       hash: md5
-      md5: 366dd55a029e3975a7b469e3c3c53220
-      size: 598
+      md5: a01b71bf3eb33976aed90bdbd9b7c434
+      size: 536
     - path: data/raw/kaggle_imdb.csv
       hash: md5
-      md5: a3fdf77261f84f70d6cd4e78f5042a62
+      md5: 168fee7d198cf374b9b5db19acd98c09
       size: 29718188
     - path: data/raw/reddit_reviews.csv
       hash: md5
-      md5: be573bfa043f3ec1a81fd84e3c78d25b
-      size: 1121965
+      md5: 518377e5acaae86b4e5e18d0623062a7
+      size: 158
+  data_validation:
+    cmd: python src/preprocessing/validate_data.py
+    deps:
+    - path: data/raw/kaggle_imdb.csv
+      hash: md5
+      md5: 168fee7d198cf374b9b5db19acd98c09
+      size: 29718188
+    - path: data/raw/reddit_reviews.csv
+      hash: md5
+      md5: 518377e5acaae86b4e5e18d0623062a7
+      size: 158
+    - path: src/preprocessing/validate_data.py
+      hash: md5
+      md5: cae87c7b998b73a434496725587498f0
+      size: 1676
+    outs:
+    - path: data/raw/validated_data.csv
+      hash: md5
+      md5: b167a12057123498692c4c2b1e9c08cc
+      size: 29718188
+    - path: data/raw/validation_report.json
+      hash: md5
+      md5: a3b9746ead0eb87e060e0799f31920ac
+      size: 279
+  preprocessing:
+    cmd: python src/preprocessing/preprocess.py
+    deps:
+    - path: data/raw/validated_data.csv
+      hash: md5
+      md5: b167a12057123498692c4c2b1e9c08cc
+      size: 29718188
+    - path: src/preprocessing/preprocess.py
+      hash: md5
+      md5: 35c1a1619d0a0bd3968761983e3ae1a3
+      size: 13123
+    - path: src/preprocessing/text_cleaner.py
+      hash: md5
+      md5: a259f5a8436871f313a8a7aab8e9ad93
+      size: 7320
+    params:
+      params.yaml:
+        preprocessing:
+          classification_type: binary
+          min_length: 20
+          max_length: 5000
+          remove_stopwords: false
+          lowercase: true
+          remove_urls: true
+          remove_html: true
+          remove_special_chars: false
+          max_features_tfidf: 5000
+          train_size: 0.7
+          val_size: 0.15
+          test_size: 0.15
+          random_state: 42
+          stratify: true
+    outs:
+    - path: data/processed/label_encoder.pkl
+      hash: md5
+      md5: 1540b9cd969678ccc4501b7c44c05604
+      size: 299
+    - path: data/processed/preprocessing_stats.json
+      hash: md5
+      md5: 88d3b60359e615545becc6fd40138b15
+      size: 1492
+    - path: data/processed/test.csv
+      hash: md5
+      md5: cdc5b24a41ce8161bed0e6cfd17fc392
+      size: 3909873
+    - path: data/processed/tfidf_vectorizer.pkl
+      hash: md5
+      md5: 83f3c6fbcdf4dcb5b13cb767acabaf09
+      size: 17528664
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 09b6a7b25d57704931ef3fa05bdef325
+      size: 18250079
+    - path: data/processed/validation.csv
+      hash: md5
+      md5: 367b00370855757773d4da79879a949d
+      size: 3898538
