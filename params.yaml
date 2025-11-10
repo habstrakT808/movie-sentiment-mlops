@@ -83,23 +83,26 @@ model:
       C: [0.1, 1, 10]
       penalty: ['l1', 'l2']
       solver: ['liblinear', 'saga']
-      max_iter: 1000
+      max_iter: [2000]  # Increased for better convergence with large dataset
 
     random_forest:
       n_estimators: [100, 200, 300]
-      max_depth: [10, 20, 30, null]
-      min_samples_split: [2, 5, 10]
-      min_samples_leaf: [1, 2, 4]
+      max_depth: [10, 20, 30]  # Removed null to prevent unlimited depth
+      min_samples_split: [5, 10, 20]  # Increased minimum samples to split
+      min_samples_leaf: [2, 4, 8]  # Increased minimum samples per leaf
 
     svm:
-      C: [0.1, 1, 10]
-      kernel: ['linear', 'rbf']
-      gamma: ['scale', 'auto']
+      # Using RBF kernel only (skip linear - too slow for large dataset)
+      C: [0.1, 1, 10, 100]  # 4 values - good range for tuning
+      kernel: ['rbf']  # Only RBF kernel (skip linear - too slow)
+      gamma: ['scale', 'auto']  # 2 values - both are important for RBF
+      # Total: 4 × 1 × 2 = 8 combinations, 8 × 5 = 40 fits
+      # Estimated time: ~14 hours with n_jobs=-1
 
   # Transformer model
   transformer:
     model_name: "distilbert-base-uncased"
-    num_labels: 3
+    num_labels: 2
     max_length: 512
     epochs: 3
     batch_size: 16

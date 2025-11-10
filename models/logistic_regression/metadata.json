@@ -1,0 +1,86 @@
+{
+  "model_name": "logistic_regression",
+  "config": {
+    "random_state": 42,
+    "test_size": 0.15,
+    "cv_folds": 5,
+    "logistic_regression": {
+      "C": [
+        0.1,
+        1,
+        10
+      ],
+      "penalty": [
+        "l1",
+        "l2"
+      ],
+      "solver": [
+        "liblinear",
+        "saga"
+      ],
+      "max_iter": [
+        1000
+      ]
+    },
+    "random_forest": {
+      "n_estimators": [
+        100,
+        200,
+        300
+      ],
+      "max_depth": [
+        10,
+        20,
+        30
+      ],
+      "min_samples_split": [
+        5,
+        10,
+        20
+      ],
+      "min_samples_leaf": [
+        2,
+        4,
+        8
+      ]
+    },
+    "svm": {
+      "C": [
+        0.1,
+        1,
+        10
+      ],
+      "kernel": [
+        "linear",
+        "rbf"
+      ],
+      "gamma": [
+        "scale",
+        "auto"
+      ]
+    }
+  },
+  "best_params": {
+    "C": 10,
+    "max_iter": 1000,
+    "penalty": "l2",
+    "solver": "liblinear"
+  },
+  "metrics": {
+    "train_accuracy": 0.9683571428571428,
+    "train_precision": 0.9656298821190172,
+    "train_recall": 0.9712857142857143,
+    "train_f1": 0.9684495406310092,
+    "train_roc_auc": 0.9951641836734695,
+    "val_accuracy": 0.8753333333333333,
+    "val_precision": 0.8613607188703466,
+    "val_recall": 0.8946666666666667,
+    "val_f1": 0.8776978417266187,
+    "val_roc_auc": 0.9437511111111111,
+    "test_accuracy": 0.874,
+    "test_precision": 0.8661879895561357,
+    "test_recall": 0.8846666666666667,
+    "test_f1": 0.87532981530343,
+    "test_roc_auc": 0.9460866666666667
+  }
+}

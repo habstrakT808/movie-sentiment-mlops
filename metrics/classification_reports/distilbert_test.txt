@@ -1,0 +1,11 @@
+Classification Report - distilbert (test)
+================================================================================
+
+              precision    recall  f1-score   support
+
+    Negative     0.9253    0.9247    0.9250      1500
+    Positive     0.9247    0.9253    0.9250      1500
+
+    accuracy                         0.9250      3000
+   macro avg     0.9250    0.9250    0.9250      3000
+weighted avg     0.9250    0.9250    0.9250      3000

@@ -7,7 +7,7 @@ scipy==1.11.4
 praw==7.7.1
 kaggle==1.5.16
 beautifulsoup4==4.12.2
-requests==2.31.0
+requests>=2.32.3
 lxml==4.9.3
 
 # Text Processing
@@ -22,7 +22,7 @@ imbalanced-learn==0.11.0
 xgboost==2.0.3
 
 # Deep Learning
-torch==2.1.1
+torch==2.5.1
 transformers==4.35.2
 datasets==3.1.0
 accelerate==0.25.0

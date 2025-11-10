@@ -1,0 +1,85 @@
+{
+  "model_name": "svm",
+  "config": {
+    "random_state": 42,
+    "test_size": 0.15,
+    "cv_folds": 5,
+    "logistic_regression": {
+      "C": [
+        0.1,
+        1,
+        10
+      ],
+      "penalty": [
+        "l1",
+        "l2"
+      ],
+      "solver": [
+        "liblinear",
+        "saga"
+      ],
+      "max_iter": [
+        2000
+      ]
+    },
+    "random_forest": {
+      "n_estimators": [
+        100,
+        200,
+        300
+      ],
+      "max_depth": [
+        10,
+        20,
+        30
+      ],
+      "min_samples_split": [
+        5,
+        10,
+        20
+      ],
+      "min_samples_leaf": [
+        2,
+        4,
+        8
+      ]
+    },
+    "svm": {
+      "C": [
+        0.1,
+        1,
+        10,
+        100
+      ],
+      "kernel": [
+        "rbf"
+      ],
+      "gamma": [
+        "scale",
+        "auto"
+      ]
+    }
+  },
+  "best_params": {
+    "C": 100,
+    "gamma": "auto",
+    "kernel": "rbf"
+  },
+  "metrics": {
+    "train_accuracy": 0.8168571428571428,
+    "train_precision": 0.8058466629895201,
+    "train_recall": 0.8348571428571429,
+    "train_f1": 0.8200954252034802,
+    "train_roc_auc": 0.9003358571428571,
+    "val_accuracy": 0.6636666666666666,
+    "val_precision": 0.6546943919344675,
+    "val_recall": 0.6926666666666667,
+    "val_f1": 0.6731454486556527,
+    "val_roc_auc": 0.7132871111111111,
+    "test_accuracy": 0.675,
+    "test_precision": 0.6627402355858648,
+    "test_recall": 0.7126666666666667,
+    "test_f1": 0.6867973016382911,
+    "test_roc_auc": 0.7151968888888889
+  }
+}

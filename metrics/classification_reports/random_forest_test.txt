@@ -1,0 +1,11 @@
+Classification Report - random_forest (test)
+================================================================================
+
+              precision    recall  f1-score   support
+
+    Negative     0.8574    0.8260    0.8414      1500
+    Positive     0.8322    0.8627    0.8471      1500
+
+    accuracy                         0.8443      3000
+   macro avg     0.8448    0.8443    0.8443      3000
+weighted avg     0.8448    0.8443    0.8443      3000

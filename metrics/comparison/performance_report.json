@@ -1,0 +1,118 @@
+{
+  "summary": {
+    "total_models": 4,
+    "best_model": "distilbert",
+    "best_f1": 0.9250249916694434,
+    "models_passed_gates": 2
+  },
+  "models": {
+    "logistic_regression": {
+      "metrics": {
+        "test_accuracy": 0.874,
+        "test_precision": 0.8661879895561357,
+        "test_recall": 0.8846666666666667,
+        "test_f1": 0.87532981530343,
+        "test_roc_auc": 0.9460866666666667
+      },
+      "gates": {
+        "accuracy": {
+          "value": 0.874,
+          "threshold": 0.85,
+          "passed": true
+        },
+        "f1": {
+          "value": 0.87532981530343,
+          "threshold": 0.83,
+          "passed": true
+        },
+        "precision": {
+          "value": 0.8661879895561357,
+          "threshold": 0.82,
+          "passed": true
+        }
+      },
+      "all_gates_passed": true
+    },
+    "random_forest": {
+      "metrics": {
+        "test_accuracy": 0.8443333333333334,
+        "test_precision": 0.8321543408360128,
+        "test_recall": 0.8626666666666667,
+        "test_f1": 0.8471358428805237,
+        "test_roc_auc": 0.9227506666666666
+      },
+      "gates": {
+        "accuracy": {
+          "value": 0.8443333333333334,
+          "threshold": 0.85,
+          "passed": false
+        },
+        "f1": {
+          "value": 0.8471358428805237,
+          "threshold": 0.83,
+          "passed": true
+        },
+        "precision": {
+          "value": 0.8321543408360128,
+          "threshold": 0.82,
+          "passed": true
+        }
+      },
+      "all_gates_passed": false
+    },
+    "svm": {
+      "metrics": {
+        "test_accuracy": 0.675,
+        "test_precision": 0.6627402355858648,
+        "test_recall": 0.7126666666666667,
+        "test_f1": 0.6867973016382911,
+        "test_roc_auc": 0.7151968888888889
+      },
+      "gates": {
+        "accuracy": {
+          "value": 0.675,
+          "threshold": 0.85,
+          "passed": false
+        },
+        "f1": {
+          "value": 0.6867973016382911,
+          "threshold": 0.83,
+          "passed": false
+        },
+        "precision": {
+          "value": 0.6627402355858648,
+          "threshold": 0.82,
+          "passed": false
+        }
+      },
+      "all_gates_passed": false
+    },
+    "distilbert": {
+      "metrics": {
+        "test_accuracy": 0.925,
+        "test_precision": 0.9247168554297135,
+        "test_recall": 0.9253333333333333,
+        "test_f1": 0.9250249916694434,
+        "test_roc_auc": 0.9766302222222222
+      },
+      "gates": {
+        "accuracy": {
+          "value": 0.925,
+          "threshold": 0.85,
+          "passed": true
+        },
+        "f1": {
+          "value": 0.9250249916694434,
+          "threshold": 0.83,
+          "passed": true
+        },
+        "precision": {
+          "value": 0.9247168554297135,
+          "threshold": 0.82,
+          "passed": true
+        }
+      },
+      "all_gates_passed": true
+    }
+  }
+}

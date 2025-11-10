@@ -50,3 +50,56 @@ stages:
     metrics:
       - data/processed/preprocessing_stats.json:
           cache: false
+
+# Stage 4: Train Traditional ML Models
+  train_traditional:
+    cmd: python src/models/train_traditional.py
+    deps:
+      - src/models/train_traditional.py
+      - src/models/base_trainer.py
+      - src/models/utils.py
+      - data/processed/train_features.csv
+      - data/processed/validation_features.csv
+      - data/processed/test_features.csv
+    params:
+      - model.traditional
+      - evaluation
+    outs:
+      - models/logistic_regression/
+      - models/random_forest/
+      - models/svm/
+    metrics:
+      - metrics/traditional_ml_results.json:
+          cache: false
+
+  # Stage 5: Train Transformer Model
+  train_transformer:
+    cmd: python src/models/train_transformer.py
+    deps:
+      - src/models/train_transformer.py
+      - src/models/base_trainer.py
+      - data/processed/train.csv
+      - data/processed/validation.csv
+      - data/processed/test.csv
+    params:
+      - model.transformer
+      - evaluation
+    outs:
+      - models/distilbert/
+    metrics:
+      - metrics/transformer_results.json:
+          cache: false
+
+  # Stage 6: Model Comparison
+  compare_models:
+    cmd: python src/models/compare_models.py
+    deps:
+      - src/models/compare_models.py
+      - models/logistic_regression/metadata.json
+      - models/random_forest/metadata.json
+      - models/svm/metadata.json
+      - models/distilbert/metadata.json
+    outs:
+      - metrics/comparison/performance_report.json
+      - metrics/comparison/metrics_comparison.png
+      - metrics/comparison/roc_curves_comparison.png

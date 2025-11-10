@@ -10,6 +10,11 @@ repos:
       - id: check-yaml
       - id: check-added-large-files
         args: ['--maxkb=10000']
+        exclude: |
+            (?x)^(
+                models/.*\.(pkl|safetensors|bin|h5|pth)|
+                models/.*/checkpoint.*/.*\.(safetensors|bin)
+            )$
       - id: check-json
       - id: check-merge-conflict
       - id: detect-private-key

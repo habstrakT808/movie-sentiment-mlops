@@ -9,43 +9,42 @@
   ],
   "data_shapes": {
     "original": [
-      20411,
+      20000,
       17
     ],
     "after_cleaning": [
-      20411,
+      20000,
       18
     ],
     "train": [
-      14191,
+      14000,
       18
     ],
     "val": [
-      3041,
+      3000,
       18
     ],
     "test": [
-      3042,
+      3000,
       18
     ]
   },
   "class_distributions": {
     "original": {
-      "negative": 10137,
-      "positive": 10137,
-      "neutral": 137
+      "negative": 10000,
+      "positive": 10000
     },
     "train": {
-      "positive": 7096,
-      "negative": 7095
+      "negative": 7000,
+      "positive": 7000
     },
     "val": {
-      "negative": 1521,
-      "positive": 1520
+      "negative": 1500,
+      "positive": 1500
     },
     "test": {
-      "negative": 1521,
-      "positive": 1521
+      "positive": 1500,
+      "negative": 1500
     }
   },
   "feature_counts": {
@@ -54,12 +53,12 @@
     "total": 5016
   },
   "cleaning_stats": {
-    "total_processed": 20411,
-    "urls_removed": 164,
-    "html_removed": 20401,
+    "total_processed": 20000,
+    "urls_removed": 78,
+    "html_removed": 19996,
     "emails_removed": 0,
     "mentions_removed": 0,
-    "excessive_spaces_normalized": 20411
+    "excessive_spaces_normalized": 20000
   },
   "config": {
     "classification_type": "binary",

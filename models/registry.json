@@ -1,0 +1,91 @@
+{
+  "models": {
+    "svm": [
+      {
+        "model_name": "svm",
+        "run_id": "5110cfebfb4c4945b02ca369b3224c3e",
+        "metrics": {
+          "train_accuracy": 0.8168571428571428,
+          "train_precision": 0.8058466629895201,
+          "train_recall": 0.8348571428571429,
+          "train_f1": 0.8200954252034802,
+          "train_roc_auc": 0.9003358571428571,
+          "val_accuracy": 0.6636666666666666,
+          "val_precision": 0.6546943919344675,
+          "val_recall": 0.6926666666666667,
+          "val_f1": 0.6731454486556527,
+          "val_roc_auc": 0.7132871111111111,
+          "test_accuracy": 0.675,
+          "test_precision": 0.6627402355858648,
+          "test_recall": 0.7126666666666667,
+          "test_f1": 0.6867973016382911,
+          "test_roc_auc": 0.7151968888888889
+        },
+        "model_path": "D:\\Project\\movie-sentiment-mlops\\models\\svm\\model.pkl",
+        "metadata": {
+          "best_params": {
+            "C": 100,
+            "gamma": "auto",
+            "kernel": "rbf"
+          }
+        }
+      },
+      {
+        "model_name": "svm",
+        "run_id": null,
+        "metrics": {
+          "train_accuracy": 0.8168571428571428,
+          "train_precision": 0.8058466629895201,
+          "train_recall": 0.8348571428571429,
+          "train_f1": 0.8200954252034802,
+          "train_roc_auc": 0.9003358571428571,
+          "val_accuracy": 0.6636666666666666,
+          "val_precision": 0.6546943919344675,
+          "val_recall": 0.6926666666666667,
+          "val_f1": 0.6731454486556527,
+          "val_roc_auc": 0.7132871111111111,
+          "test_accuracy": 0.675,
+          "test_precision": 0.6627402355858648,
+          "test_recall": 0.7126666666666667,
+          "test_f1": 0.6867973016382911,
+          "test_roc_auc": 0.7151968888888889
+        },
+        "model_path": "D:\\Project\\movie-sentiment-mlops\\models\\svm\\model.pkl",
+        "metadata": {
+          "best_params": {
+            "C": 100,
+            "gamma": "auto",
+            "kernel": "rbf"
+          }
+        }
+      }
+    ],
+    "distilbert": [
+      {
+        "model_name": "distilbert",
+        "run_id": null,
+        "metrics": {
+          "train_accuracy": 0.9859285714285714,
+          "train_precision": 0.9851661674511482,
+          "train_recall": 0.9867142857142858,
+          "train_f1": 0.9859396188708872,
+          "train_roc_auc": 0.9960479387755102,
+          "val_accuracy": 0.9226666666666666,
+          "val_precision": 0.9209827357237715,
+          "val_recall": 0.9246666666666666,
+          "val_f1": 0.9228210246174318,
+          "val_roc_auc": 0.9765688888888888,
+          "test_accuracy": 0.925,
+          "test_precision": 0.9247168554297135,
+          "test_recall": 0.9253333333333333,
+          "test_f1": 0.9250249916694434,
+          "test_roc_auc": 0.9766302222222222
+        },
+        "model_path": "D:\\Project\\movie-sentiment-mlops\\models\\distilbert",
+        "metadata": {
+          "training_time": 6761.61123251915
+        }
+      }
+    ]
+  }
+}
