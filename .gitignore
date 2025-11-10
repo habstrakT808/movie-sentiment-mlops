@@ -47,10 +47,12 @@ data/processed/*.pkl
 data/external/*.csv
 
 # Models (tracked by DVC)
-models/*.pkl
-models/*.h5
-models/*.pth
-models/*.bin
+models/**/*.pkl
+models/**/*.h5
+models/**/*.pth
+models/**/*.bin
+models/**/*.safetensors
+models/**/checkpoint_*/*.safetensors
 
 # MLflow
 mlruns/
