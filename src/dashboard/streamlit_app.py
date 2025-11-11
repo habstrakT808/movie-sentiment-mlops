@@ -1,5 +1,6 @@
 """
 Main Streamlit application for Movie Sentiment Analysis.
+Enhanced with stunning visuals and animations.
 """
 
 import uuid
@@ -10,7 +11,6 @@ from src.dashboard.components.database import get_database
 from src.dashboard.components.model_loader import get_model_loader, initialize_models
 from src.dashboard.config import (
     APP_ICON,
-    APP_TITLE,
     AVAILABLE_MODELS,
     DISTILBERT_PATH,
     LAYOUT,
@@ -46,113 +46,505 @@ st.set_page_config(
     },
 )
 
-# Custom CSS
+# Enhanced Custom CSS with Animations
 st.markdown(
     """
 <style>
+    /* Import Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+
+    /* Global Styles */
+    * {
+        font-family: 'Inter', sans-serif;
+    }
+
     /* Main theme */
     .main {
-        background-color: #0E1117;
+        background: linear-gradient(135deg, #0E1117 0%, #1a1d29 100%);
     }
 
-    /* Headers */
+    /* Headers with gradient text */
     h1 {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 800;
+        padding-bottom: 1rem;
+        border-bottom: 3px solid;
+        border-image: linear-gradient(90deg, #667eea, #764ba2) 1;
+        animation: fadeInDown 0.8s ease-out;
+    }
+
+    h2 {
         color: #FAFAFA;
         font-weight: 700;
-        padding-bottom: 1rem;
-        border-bottom: 2px solid #FF4B4B;
+        margin-top: 2rem;
+        animation: fadeIn 1s ease-out;
     }
 
-    h2, h3 {
+    h3 {
         color: #FAFAFA;
         font-weight: 600;
     }
 
-    /* Cards */
+    /* Hero Section */
+    .hero-section {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        border-radius: 20px;
+        padding: 3rem 2rem;
+        margin: 2rem 0;
+        border: 1px solid rgba(102, 126, 234, 0.3);
+        box-shadow: 0 8px 32px rgba(102, 126, 234, 0.1);
+        animation: fadeInUp 1s ease-out;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+        animation: pulse 4s ease-in-out infinite;
+    }
+
+    .hero-title {
+        font-size: 3rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+        animation: gradientShift 3s ease infinite;
+        background-size: 200% auto;
+    }
+
+    .hero-subtitle {
+        font-size: 1.3rem;
+        color: #B0B0B0;
+        margin-bottom: 2rem;
+        font-weight: 400;
+    }
+
+    /* Glassmorphism Cards */
+    .glass-card {
+        background: rgba(38, 39, 48, 0.7);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.6s ease-out;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .glass-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        transition: left 0.5s;
+    }
+
+    .glass-card:hover::before {
+        left: 100%;
+    }
+
+    .glass-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 48px rgba(102, 126, 234, 0.2);
+        border-color: rgba(102, 126, 234, 0.5);
+    }
+
+    /* Metric Cards with Gradient */
     .metric-card {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
         margin: 10px 0;
         color: white;
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.8s ease-out;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .metric-card::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .metric-card:hover::after {
+        opacity: 1;
+    }
+
+    .metric-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 16px 48px rgba(102, 126, 234, 0.4);
+    }
+
+    .metric-value {
+        font-size: 3rem;
+        font-weight: 800;
+        margin: 1rem 0;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .metric-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .metric-icon {
+        font-size: 2.5rem;
+        opacity: 0.8;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Feature Cards */
+    .feature-card {
+        background: rgba(38, 39, 48, 0.5);
+        border-radius: 15px;
+        padding: 1.5rem;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+        transition: all 0.3s ease;
+        height: 100%;
+        cursor: pointer;
+    }
+
+    .feature-card:hover {
+        background: rgba(102, 126, 234, 0.1);
+        border-color: rgba(102, 126, 234, 0.5);
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
+    }
+
+    .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    .feature-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #FAFAFA;
+        margin-bottom: 0.5rem;
+    }
+
+    .feature-description {
+        font-size: 0.9rem;
+        color: #B0B0B0;
+        line-height: 1.6;
+    }
+
+    /* Status Indicators */
+    .status-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    .status-success {
+        background: rgba(0, 210, 106, 0.2);
+        color: #00D26A;
+        border: 1px solid rgba(0, 210, 106, 0.3);
+    }
+
+    .status-warning {
+        background: rgba(255, 165, 0, 0.2);
+        color: #FFA500;
+        border: 1px solid rgba(255, 165, 0, 0.3);
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: currentColor;
+        animation: pulse 2s ease-in-out infinite;
     }
 
     /* Buttons */
     .stButton > button {
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         border: none;
-        border-radius: 5px;
-        padding: 0.5rem 2rem;
-        font-weight: 600;
+        border-radius: 12px;
+        padding: 0.75rem 2rem;
+        font-weight: 700;
+        font-size: 1rem;
         transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     .stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
     }
 
-    /* Text input */
-    .stTextArea > div > div > textarea {
-        background-color: #262730;
+    .stButton > button:active {
+        transform: translateY(-1px);
+    }
+
+    /* Navigation Cards */
+    .nav-card {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        border: 2px solid rgba(102, 126, 234, 0.3);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        text-align: center;
+        height: 100%;
+    }
+
+    .nav-card:hover {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+        border-color: rgba(102, 126, 234, 0.6);
+        transform: translateY(-8px);
+        box-shadow: 0 12px 40px rgba(102, 126, 234, 0.3);
+    }
+
+    .nav-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        display: block;
+        animation: bounce 2s ease-in-out infinite;
+    }
+
+    .nav-title {
+        font-size: 1.5rem;
+        font-weight: 700;
         color: #FAFAFA;
-        border: 1px solid #464646;
-        border-radius: 5px;
+        margin-bottom: 0.5rem;
     }
 
-    /* Selectbox */
-    .stSelectbox > div > div {
-        background-color: #262730;
-        color: #FAFAFA;
-        border-radius: 5px;
+    .nav-description {
+        font-size: 1rem;
+        color: #B0B0B0;
     }
 
-    /* Dataframe */
+    /* Dataframe Styling */
     .dataframe {
-        background-color: #262730;
-        color: #FAFAFA;
+        background-color: rgba(38, 39, 48, 0.5) !important;
+        border-radius: 10px;
+        overflow: hidden;
     }
 
-    /* Sidebar */
-    .css-1d391kg {
-        background-color: #262730;
+    /* Sidebar Enhancements */
+    .css-1d391kg, [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #1a1d29 0%, #0E1117 100%);
     }
 
-    /* Success/Error boxes */
+    [data-testid="stSidebar"] .element-container {
+        animation: fadeInLeft 0.5s ease-out;
+    }
+
+    /* Success/Error/Info Boxes */
     .stSuccess {
-        background-color: rgba(0, 210, 106, 0.1);
+        background: rgba(0, 210, 106, 0.1);
         border-left: 4px solid #00D26A;
+        border-radius: 8px;
+        animation: slideInRight 0.5s ease-out;
     }
 
     .stError {
-        background-color: rgba(255, 75, 75, 0.1);
+        background: rgba(255, 75, 75, 0.1);
         border-left: 4px solid #FF4B4B;
+        border-radius: 8px;
+        animation: shake 0.5s ease-out;
     }
 
     .stInfo {
-        background-color: rgba(102, 126, 234, 0.1);
+        background: rgba(102, 126, 234, 0.1);
         border-left: 4px solid #667eea;
+        border-radius: 8px;
+        animation: slideInRight 0.5s ease-out;
     }
 
     .stWarning {
-        background-color: rgba(255, 165, 0, 0.1);
+        background: rgba(255, 165, 0, 0.1);
         border-left: 4px solid #FFA500;
+        border-radius: 8px;
+        animation: slideInRight 0.5s ease-out;
+    }
+
+    /* Progress Bars */
+    .stProgress > div > div {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+    }
+
+    /* Divider */
+    hr {
+        margin: 2rem 0;
+        border: none;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.5), transparent);
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.5;
+        }
+    }
+
+    @keyframes bounce {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    @keyframes shake {
+        0%, 100% {
+            transform: translateX(0);
+        }
+        25% {
+            transform: translateX(-10px);
+        }
+        75% {
+            transform: translateX(10px);
+        }
+    }
+
+    @keyframes gradientShift {
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
     }
 
     /* Hide Streamlit branding */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 
-    /* Animation */
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
     }
 
-    .element-container {
-        animation: fadeIn 0.5s ease-out;
+    ::-webkit-scrollbar-track {
+        background: #1a1d29;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1rem;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+        }
     }
 </style>
 """,
@@ -179,7 +571,7 @@ def initialize_session_state():
 def load_models():
     """Load models if not already loaded."""
     if not st.session_state.models_loaded:
-        with st.spinner("🔄 Loading models... This may take a moment..."):
+        with st.spinner("🔄 Loading AI models... This may take a moment..."):
             try:
                 distilbert_ok, logistic_ok = initialize_models(
                     DISTILBERT_PATH, LOGISTIC_REGRESSION_PATH
@@ -203,62 +595,161 @@ def load_models():
 
 
 def display_sidebar():
-    """Display sidebar with app information."""
+    """Display enhanced sidebar with app information."""
     with st.sidebar:
-        st.title(APP_TITLE)
+        # Logo/Title Section
+        st.markdown(
+            """
+        <div style="text-align: center; padding: 1rem 0;">
+            <div style="font-size: 3rem; margin-bottom: 0.5rem;">🎬</div>
+            <h2 style="margin: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                Movie Sentiment
+            </h2>
+            <p style="color: #B0B0B0; font-size: 0.9rem; margin-top: 0.5rem;">
+                AI-Powered Analysis
+            </p>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+
         st.markdown("---")
 
-        # Model status
-        st.subheader("🤖 Model Status")
+        # Model Status Section
+        st.markdown("### 🤖 Model Status")
 
         loader = get_model_loader()
         loaded_models = loader.get_loaded_models()
 
         for model_name, model_info in AVAILABLE_MODELS.items():
             if model_name in loaded_models:
-                st.success(f"✅ {model_name}")
-                st.caption(f"Accuracy: {model_info['accuracy']:.1%}")
+                st.markdown(
+                    f"""
+                <div class="status-indicator status-success">
+                    <span class="status-dot"></span>
+                    <span>{model_name}</span>
+                </div>
+                <div style="margin-left: 1.5rem; margin-bottom: 1rem; font-size: 0.85rem; color: #B0B0B0;">
+                    Accuracy: <strong style="color: #00D26A;">{model_info['accuracy']:.1%}</strong>
+                </div>
+                """,
+                    unsafe_allow_html=True,
+                )
             else:
-                st.warning(f"⚠️ {model_name} (Not loaded)")
+                st.markdown(
+                    f"""
+                <div class="status-indicator status-warning">
+                    <span class="status-dot"></span>
+                    <span>{model_name}</span>
+                </div>
+                <div style="margin-left: 1.5rem; margin-bottom: 1rem; font-size: 0.85rem; color: #B0B0B0;">
+                    Not loaded
+                </div>
+                """,
+                    unsafe_allow_html=True,
+                )
 
         st.markdown("---")
 
-        # Statistics
-        st.subheader("📊 Statistics")
+        # Statistics Section
+        st.markdown("### 📊 Session Stats")
 
         db = get_database()
         stats = db.get_statistics()
 
-        st.metric("Total Predictions", stats["total"])
-        st.metric("Today's Predictions", stats["today"])
+        # Total Predictions
+        st.markdown(
+            f"""
+        <div style="background: rgba(102, 126, 234, 0.1); padding: 1rem; border-radius: 10px; margin-bottom: 0.5rem;">
+            <div style="font-size: 0.8rem; color: #B0B0B0; text-transform: uppercase; letter-spacing: 1px;">
+                Total Predictions
+            </div>
+            <div style="font-size: 2rem; font-weight: 800; color: #667eea;">
+                {stats['total']}
+            </div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+
+        # Today's Predictions
+        st.markdown(
+            f"""
+        <div style="background: rgba(0, 210, 106, 0.1); padding: 1rem; border-radius: 10px; margin-bottom: 0.5rem;">
+            <div style="font-size: 0.8rem; color: #B0B0B0; text-transform: uppercase; letter-spacing: 1px;">
+                Today
+            </div>
+            <div style="font-size: 2rem; font-weight: 800; color: #00D26A;">
+                {stats['today']}
+            </div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
 
         if stats["total"] > 0:
-            st.metric("Average Confidence", f"{stats['avg_confidence']:.1%}")
+            st.markdown(
+                f"""
+            <div style="background: rgba(255, 165, 0, 0.1); padding: 1rem; border-radius: 10px;">
+                <div style="font-size: 0.8rem; color: #B0B0B0; text-transform: uppercase; letter-spacing: 1px;">
+                    Avg Confidence
+                </div>
+                <div style="font-size: 2rem; font-weight: 800; color: #FFA500;">
+                    {stats['avg_confidence']:.0%}
+                </div>
+            </div>
+            """,
+                unsafe_allow_html=True,
+            )
 
         st.markdown("---")
 
-        # Session info
-        st.subheader("ℹ️ Session Info")
-        st.caption(f"Session ID: {st.session_state.session_id[:8]}...")
-        st.caption(f"Predictions this session: {st.session_state.prediction_count}")
+        # Session Info
+        st.markdown("### ℹ️ Session Info")
+        st.caption(f"🆔 Session: {st.session_state.session_id[:8]}...")
+        st.caption(f"🎯 Predictions: {st.session_state.prediction_count}")
 
         st.markdown("---")
 
-        # Links
-        st.subheader("🔗 Links")
+        # Quick Links
+        st.markdown("### 🔗 Quick Links")
         st.markdown(
             """
-        - [GitHub Repository](https://github.com/habstrakT808/movie-sentiment-mlops)
-        - [Documentation](https://github.com/habstrakT808/movie-sentiment-mlops/blob/main/README.md)
-        - [Report Issue](https://github.com/habstrakT808/movie-sentiment-mlops/issues)
-        """
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <a href="https://github.com/habstrakT808/movie-sentiment-mlops" target="_blank"
+               style="color: #667eea; text-decoration: none; padding: 0.5rem; background: rgba(102, 126, 234, 0.1);
+               border-radius: 8px; transition: all 0.3s;">
+                📦 GitHub Repository
+            </a>
+            <a href="https://github.com/habstrakT808/movie-sentiment-mlops/blob/main/README.md" target="_blank"
+               style="color: #667eea; text-decoration: none; padding: 0.5rem; background: rgba(102, 126, 234, 0.1);
+               border-radius: 8px; transition: all 0.3s;">
+                📚 Documentation
+            </a>
+            <a href="https://github.com/habstrakT808/movie-sentiment-mlops/issues" target="_blank"
+               style="color: #667eea; text-decoration: none; padding: 0.5rem; background: rgba(102, 126, 234, 0.1);
+               border-radius: 8px; transition: all 0.3s;">
+                🐛 Report Issue
+            </a>
+        </div>
+        """,
+            unsafe_allow_html=True,
         )
 
         st.markdown("---")
 
         # Footer
-        st.caption("Made with ❤️ using Streamlit")
-        st.caption("Version 1.0.0")
+        st.markdown(
+            """
+        <div style="text-align: center; padding: 1rem 0; color: #666;">
+            <p style="font-size: 0.8rem; margin: 0;">Made with ❤️ using</p>
+            <p style="font-size: 0.9rem; font-weight: 600; margin: 0.25rem 0;">Streamlit & PyTorch</p>
+            <p style="font-size: 0.75rem; color: #555; margin-top: 0.5rem;">Version 1.0.0</p>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
 
 
 def main():
@@ -273,27 +764,78 @@ def main():
     if not load_models():
         st.stop()
 
-    # Main content
-    st.title("🎬 Movie Sentiment Analysis")
+    # Hero Section
     st.markdown(
         """
-    Welcome to the **Movie Sentiment Analysis Dashboard**! This application uses
-    state-of-the-art machine learning models to analyze the sentiment of movie reviews.
-    """
+    <div class="hero-section">
+        <div class="hero-title">🎬 Movie Sentiment Analysis</div>
+        <div class="hero-subtitle">
+            Harness the power of AI to analyze movie reviews with state-of-the-art deep learning models
+        </div>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1;">
+            <div style="background: rgba(0, 210, 106, 0.2); padding: 0.5rem 1.5rem; border-radius: 20px; border: 1px solid rgba(0, 210, 106, 0.3);">  # noqa: E501
+                <span style="color: #00D26A; font-weight: 700;">✓ 92.50% Accuracy</span>
+            </div>
+            <div style="background: rgba(102, 126, 234, 0.2); padding: 0.5rem 1.5rem; border-radius: 20px; border: 1px solid rgba(102, 126, 234, 0.3);">  # noqa: E501
+                <span style="color: #667eea; font-weight: 700;">⚡ Real-time Analysis</span>
+            </div>
+            <div style="background: rgba(255, 165, 0, 0.2); padding: 0.5rem 1.5rem; border-radius: 20px; border: 1px solid rgba(255, 165, 0, 0.3);">  # noqa: E501
+                <span style="color: #FFA500; font-weight: 700;">🚀 2 AI Models</span>
+            </div>
+        </div>
+    </div>
+    """,
+        unsafe_allow_html=True,
     )
+
+    # Quick Navigation
+    st.markdown("## 🚀 Quick Start")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.markdown(
+            """
+        <div class="nav-card">
+            <div class="nav-icon">🎯</div>
+            <div class="nav-title">Predict</div>
+            <div class="nav-description">Analyze movie review sentiment instantly</div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+
+    with col2:
+        st.markdown(
+            """
+        <div class="nav-card">
+            <div class="nav-icon">📊</div>
+            <div class="nav-title">Performance</div>
+            <div class="nav-description">Compare model metrics & accuracy</div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+
+    with col3:
+        st.markdown(
+            """
+        <div class="nav-card">
+            <div class="nav-icon">📈</div>
+            <div class="nav-title">Insights</div>
+            <div class="nav-description">Explore data analytics & trends</div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
 
     st.info(
-        """
-    👈 **Navigate using the sidebar** to access different features:
-    - **🎯 Predict**: Analyze sentiment of movie reviews
-    - **📊 Performance**: View model performance metrics
-    - **📈 Insights**: Explore data insights and statistics
-    """
+        "👈 **Use the sidebar** to navigate between different features of the dashboard"
     )
 
-    # Quick stats
+    # Live Statistics
     st.markdown("---")
-    st.subheader("📊 Quick Statistics")
+    st.markdown("## 📊 Live Statistics")
 
     db = get_database()
     stats = db.get_statistics()
@@ -304,8 +846,9 @@ def main():
         st.markdown(
             f"""
         <div class="metric-card">
-            <div style="font-size: 14px; opacity: 0.8;">Total Predictions</div>
-            <div style="font-size: 32px; font-weight: bold;">{stats['total']}</div>
+            <div class="metric-icon">🎯</div>
+            <div class="metric-label">Total Predictions</div>
+            <div class="metric-value">{stats['total']}</div>
         </div>
         """,
             unsafe_allow_html=True,
@@ -315,9 +858,10 @@ def main():
         positive_count = stats["by_sentiment"].get("positive", 0)
         st.markdown(
             f"""
-        <div class="metric-card">
-            <div style="font-size: 14px; opacity: 0.8;">Positive Reviews</div>
-            <div style="font-size: 32px; font-weight: bold;">{positive_count}</div>
+        <div class="metric-card" style="background: linear-gradient(135deg, #00D26A 0%, #00A854 100%);">
+            <div class="metric-icon">😊</div>
+            <div class="metric-label">Positive Reviews</div>
+            <div class="metric-value">{positive_count}</div>
         </div>
         """,
             unsafe_allow_html=True,
@@ -327,9 +871,10 @@ def main():
         negative_count = stats["by_sentiment"].get("negative", 0)
         st.markdown(
             f"""
-        <div class="metric-card">
-            <div style="font-size: 14px; opacity: 0.8;">Negative Reviews</div>
-            <div style="font-size: 32px; font-weight: bold;">{negative_count}</div>
+        <div class="metric-card" style="background: linear-gradient(135deg, #FF4B4B 0%, #CC3939 100%);">
+            <div class="metric-icon">😞</div>
+            <div class="metric-label">Negative Reviews</div>
+            <div class="metric-value">{negative_count}</div>
         </div>
         """,
             unsafe_allow_html=True,
@@ -338,18 +883,19 @@ def main():
     with col4:
         st.markdown(
             f"""
-        <div class="metric-card">
-            <div style="font-size: 14px; opacity: 0.8;">Avg. Confidence</div>
-            <div style="font-size: 32px; font-weight: bold;">{stats['avg_confidence']:.1%}</div>
+        <div class="metric-card" style="background: linear-gradient(135deg, #FFA500 0%, #CC8400 100%);">
+            <div class="metric-icon">🎓</div>
+            <div class="metric-label">Avg Confidence</div>
+            <div class="metric-value">{stats['avg_confidence']:.0%}</div>
         </div>
         """,
             unsafe_allow_html=True,
         )
 
-    # Recent predictions
+    # Recent Activity
     if stats["total"] > 0:
         st.markdown("---")
-        st.subheader("🕐 Recent Predictions")
+        st.markdown("## 🕐 Recent Activity")
 
         recent_df = db.get_recent_predictions(limit=5)
 
@@ -357,7 +903,7 @@ def main():
             # Format dataframe for display
             display_df = recent_df.copy()
             display_df["text"] = display_df["text"].apply(
-                lambda x: x[:50] + "..." if len(x) > 50 else x
+                lambda x: x[:60] + "..." if len(x) > 60 else x
             )
             display_df["confidence"] = display_df["confidence"].apply(
                 lambda x: f"{x:.1%}"
@@ -366,74 +912,281 @@ def main():
                 "%Y-%m-%d %H:%M"
             )
 
+            # Add emoji to sentiment
+            display_df["sentiment"] = display_df["sentiment"].apply(
+                lambda x: f"{'😊' if x == 'positive' else '😞'} {x.capitalize()}"
+            )
+
             # Rename columns
             display_df = display_df[
                 ["timestamp", "text", "model_name", "sentiment", "confidence"]
             ].rename(
                 columns={
-                    "timestamp": "Time",
-                    "text": "Review",
-                    "model_name": "Model",
-                    "sentiment": "Sentiment",
-                    "confidence": "Confidence",
+                    "timestamp": "⏰ Time",
+                    "text": "📝 Review",
+                    "model_name": "🤖 Model",
+                    "sentiment": "🎭 Sentiment",
+                    "confidence": "📊 Confidence",
                 }
             )
 
             st.dataframe(display_df, use_container_width=True, hide_index=True)
         else:
-            st.info(
-                "No predictions yet. Go to the Predict page to make your first prediction!"
-            )
+            st.info("No recent activity. Start making predictions!")
 
-    # Getting started
+    # Features Section
     st.markdown("---")
-    st.subheader("🚀 Getting Started")
+    st.markdown("## ✨ Key Features")
 
     col1, col2 = st.columns(2)
 
     with col1:
         st.markdown(
             """
-        ### How to Use
+        <div class="feature-card">
+            <span class="feature-icon">🤖</span>
+            <div class="feature-title">Dual AI Models</div>
+            <div class="feature-description">
+                Choose between DistilBERT (92.50% accuracy) for complex analysis
+                or Logistic Regression (87.40%) for quick predictions
+            </div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
 
-        1. **Navigate to Predict page** using the sidebar
-        2. **Enter a movie review** in the text area
-        3. **Select a model** (DistilBERT or Logistic Regression)
-        4. **Click "Predict Sentiment"** to analyze
-        5. **View results** with confidence scores
-        6. **Provide feedback** to help improve the model
-        """
+        st.markdown(
+            """
+        <div class="feature-card">
+            <span class="feature-icon">⚡</span>
+            <div class="feature-title">Real-time Analysis</div>
+            <div class="feature-description">
+                Get instant sentiment predictions with confidence scores
+                and detailed probability distributions
+            </div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            """
+        <div class="feature-card">
+            <span class="feature-icon">📊</span>
+            <div class="feature-title">Performance Metrics</div>
+            <div class="feature-description">
+                Compare models with detailed metrics including accuracy,
+                precision, recall, F1-score, and ROC AUC
+            </div>
+        </div>
+        """,
+            unsafe_allow_html=True,
         )
 
     with col2:
         st.markdown(
             """
-        ### Available Models
-
-        **🤖 DistilBERT**
-        - State-of-the-art transformer model
-        - 92.50% accuracy
-        - Best for complex reviews
-
-        **📊 Logistic Regression**
-        - Fast and efficient baseline
-        - 87.40% accuracy
-        - Good for quick predictions
-        """
+        <div class="feature-card">
+            <span class="feature-icon">📈</span>
+            <div class="feature-title">Data Insights</div>
+            <div class="feature-description">
+                Explore sentiment distributions, confidence analysis,
+                and word clouds with interactive visualizations
+            </div>
+        </div>
+        """,
+            unsafe_allow_html=True,
         )
 
-    # Tips
-    st.markdown("---")
-    st.subheader("💡 Tips")
+        st.markdown(
+            """
+        <div class="feature-card">
+            <span class="feature-icon">💾</span>
+            <div class="feature-title">Prediction History</div>
+            <div class="feature-description">
+                Track all your predictions with timestamps, export to CSV,
+                and analyze patterns over time
+            </div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
 
-    st.info(
+        st.markdown(
+            """
+        <div class="feature-card">
+            <span class="feature-icon">🔒</span>
+            <div class="feature-title">Privacy First</div>
+            <div class="feature-description">
+                All processing happens locally. No data sent to external servers.
+                Your reviews stay private and secure
+            </div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+
+    # How It Works
+    st.markdown("---")
+    st.markdown("## 🔬 How It Works")
+
+    st.markdown(
         """
-    - **Longer reviews** generally produce more accurate predictions
-    - **DistilBERT** performs better on nuanced or sarcastic reviews
-    - **Logistic Regression** is faster for quick sentiment checks
-    - Check the **Performance page** to compare model metrics
-    - Explore the **Insights page** for data visualizations
-    """
+    <div class="glass-card">
+        <h3 style="margin-top: 0;">Simple 3-Step Process</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-top: 2rem;">
+            <div>
+                <div style="font-size: 3rem; margin-bottom: 1rem;">1️⃣</div>
+                <h4 style="color: #667eea; margin-bottom: 0.5rem;">Enter Review</h4>
+                <p style="color: #B0B0B0; line-height: 1.6;">
+                    Type or paste any movie review (10-5000 characters).
+                    The longer the review, the better the analysis.
+                </p>
+            </div>
+            <div>
+                <div style="font-size: 3rem; margin-bottom: 1rem;">2️⃣</div>
+                <h4 style="color: #764ba2; margin-bottom: 0.5rem;">Select Model</h4>
+                <p style="color: #B0B0B0; line-height: 1.6;">
+                    Choose DistilBERT for accuracy or Logistic Regression for speed.
+                    Each model has its strengths.
+                </p>
+            </div>
+            <div>
+                <div style="font-size: 3rem; margin-bottom: 1rem;">3️⃣</div>
+                <h4 style="color: #f093fb; margin-bottom: 0.5rem;">Get Results</h4>
+                <p style="color: #B0B0B0; line-height: 1.6;">
+                    Receive instant sentiment analysis with confidence scores,
+                    probability distribution, and detailed insights.
+                </p>
+            </div>
+        </div>
+    </div>
+    """,
+        unsafe_allow_html=True,
+    )
+
+    # Model Comparison
+    st.markdown("---")
+    st.markdown("## 🤖 Our AI Models")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown(
+            """
+        <div class="glass-card">
+            <h3 style="margin-top: 0; color: #667eea;">🧠 DistilBERT</h3>
+            <div style="margin: 1.5rem 0;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span style="color: #B0B0B0;">Accuracy</span>
+                    <span style="color: #00D26A; font-weight: 700;">92.50%</span>
+                </div>
+                <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden;">  # noqa: E501
+                    <div style="width: 92.5%; height: 100%; background: linear-gradient(90deg, #00D26A, #00A854);"></div>
+                </div>
+            </div>
+            <p style="color: #B0B0B0; line-height: 1.6; margin-bottom: 1rem;">
+                State-of-the-art transformer model with 66M parameters.
+                Excellent at understanding context, nuance, and complex language patterns.
+            </p>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <span style="background: rgba(0, 210, 106, 0.2); color: #00D26A; padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.85rem;">  # noqa: E501
+                    ✓ Best Accuracy
+                </span>
+                <span style="background: rgba(0, 210, 106, 0.2); color: #00D26A; padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.85rem;">  # noqa: E501
+                    ✓ Context Aware
+                </span>
+                <span style="background: rgba(0, 210, 106, 0.2); color: #00D26A; padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.85rem;">  # noqa: E501
+                    ✓ Handles Sarcasm
+                </span>
+            </div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+
+    with col2:
+        st.markdown(
+            """
+        <div class="glass-card">
+            <h3 style="margin-top: 0; color: #764ba2;">📊 Logistic Regression</h3>
+            <div style="margin: 1.5rem 0;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span style="color: #B0B0B0;">Accuracy</span>
+                    <span style="color: #FFA500; font-weight: 700;">87.40%</span>
+                </div>
+                <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden;">  # noqa: E501
+                    <div style="width: 87.4%; height: 100%; background: linear-gradient(90deg, #FFA500, #CC8400);"></div>
+                </div>
+            </div>
+            <p style="color: #B0B0B0; line-height: 1.6; margin-bottom: 1rem;">
+                Fast and efficient baseline model using TF-IDF features.
+                Perfect for quick sentiment checks and batch processing.
+            </p>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <span style="background: rgba(255, 165, 0, 0.2); color: #FFA500; padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.85rem;">  # noqa: E501
+                    ⚡ Fast
+                </span>
+                <span style="background: rgba(255, 165, 0, 0.2); color: #FFA500; padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.85rem;">  # noqa: E501
+                    💾 Lightweight
+                </span>
+                <span style="background: rgba(255, 165, 0, 0.2); color: #FFA500; padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.85rem;">  # noqa: E501
+                    📈 Reliable
+                </span>
+            </div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+
+    # Call to Action
+    st.markdown("---")
+    st.markdown(
+        """
+    <div style="text-align: center; padding: 3rem 1rem; background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border-radius: 20px; border: 2px solid rgba(102, 126, 234, 0.3);">  # noqa: E501
+        <h2 style="margin-bottom: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">  # noqa: E501
+            Ready to Analyze Movie Reviews?
+        </h2>
+        <p style="color: #B0B0B0; font-size: 1.1rem; margin-bottom: 2rem;">
+            Start making predictions now and explore the power of AI sentiment analysis
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="/Predict" target="_self" style="text-decoration: none;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.3s; display: inline-block;">  # noqa: E501
+                    🎯 Start Predicting
+                </div>
+            </a>
+            <a href="/Performance" target="_self" style="text-decoration: none;">
+                <div style="background: rgba(102, 126, 234, 0.2); color: #667eea; padding: 1rem 2rem; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.3s; display: inline-block; border: 2px solid #667eea;">  # noqa: E501
+                    📊 View Performance
+                </div>
+            </a>
+        </div>
+    </div>
+    """,
+        unsafe_allow_html=True,
+    )
+
+    # Footer
+    st.markdown("---")
+    st.markdown(
+        """
+    <div style="text-align: center; padding: 2rem 0; color: #666;">
+        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">
+            Built with 🔥 using <strong>Streamlit</strong>, <strong>PyTorch</strong>, and <strong>Transformers</strong>
+        </p>
+        <p style="font-size: 0.85rem; color: #555;">
+            © 2024 Movie Sentiment Analysis |
+            <a href="https://github.com/habstrakT808/movie-sentiment-mlops" target="_blank" style="color: #667eea; text-decoration: none;">  # noqa: E501
+                GitHub
+            </a> |
+            <a href="mailto:jhodywiraputra@gmail.com" style="color: #667eea; text-decoration: none;">
+                Contact
+            </a>
+        </p>
+    </div>
+    """,
+        unsafe_allow_html=True,
     )
 
 

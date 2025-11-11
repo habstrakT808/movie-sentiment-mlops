@@ -70,6 +70,12 @@ mlflow.db
 logs/*.log
 *.log
 
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+data/database/*.db
+
 # Docker
 *.tar.gz
 
