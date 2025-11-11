@@ -149,13 +149,13 @@
                          │
                          ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                    MODEL TRAINING LAYER                          │
-│  ┌──────────────────┐         ┌──────────────────┐             │
-│  │ Traditional ML   │         │  Transformer     │             │
-│  │ • Logistic Reg   │         │  • DistilBERT    │             │
-│  │ • Random Forest  │         │  • Fine-tuning   │             │
-│  │ • SVM            │         │  • Optimization  │             │
-│  └──────────────────┘         └──────────────────┘             │
+│                    MODEL TRAINING LAYER                         │
+│  ┌──────────────────┐         ┌──────────────────┐              │
+│  │ Traditional ML   │         │  Transformer     │              │
+│  │ • Logistic Reg   │         │  • DistilBERT    │              │
+│  │ • Random Forest  │         │  • Fine-tuning   │              │
+│  │ • SVM            │         │  • Optimization  │              │
+│  └──────────────────┘         └──────────────────┘               │
 │           │                             │                        │
 │           └─────────────┬───────────────┘                        │
 │                         ▼                                        │

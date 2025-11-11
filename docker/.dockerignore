@@ -1,0 +1,73 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Logs
+logs/*.log
+*.log
+
+# Data (keep only processed)
+data/raw/
+data/external/
+
+# Models (keep only distilbert)
+models/logistic_regression/
+models/random_forest/
+models/svm/
+
+# MLflow
+mlruns/
+mlflow.db
+
+# DVC
+.dvc/
+
+# Notebooks
+notebooks/
+*.ipynb
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Tests
+tests/
+
+# Scripts
+scripts/
+
+# Plots and metrics (keep only model files)
+plots/
+metrics/
+
+# Environment files
+.env
+kaggle.json
+
+# Temporary files
+*.tmp
+*.temp

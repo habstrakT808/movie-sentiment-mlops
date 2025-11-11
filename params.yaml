@@ -133,3 +133,31 @@ mlflow:
   tracking_uri: "sqlite:///mlflow.db"
   experiment_name: "movie_sentiment_analysis"
   artifact_location: "./mlruns"
+
+# API Configuration
+api:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 1
+  reload: false
+  log_level: "info"
+
+  # Model serving
+  model:
+    name: "distilbert"
+    path: "models/distilbert"
+    max_length: 512
+    batch_size: 16
+
+  # Batch prediction limits
+  batch_limits:
+    max_texts: 1000
+    recommended_texts: 100
+    max_batch_size: 32
+    default_batch_size: 16
+
+  # Monitoring
+  monitoring:
+    prometheus_enabled: true
+    metrics_endpoint: "/metrics"
+    log_requests: true

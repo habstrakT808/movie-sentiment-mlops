@@ -1,0 +1,59 @@
+FROM python:3.11-slim
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONPATH="/app"
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    gcc \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements and install Python dependencies
+COPY requirements-dashboard.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements-dashboard.txt
+
+# Copy application files
+COPY src/dashboard/ ./src/dashboard/
+COPY src/preprocessing/ ./src/preprocessing/
+COPY src/utils/ ./src/utils/
+COPY src/__init__.py ./src/__init__.py
+
+# Copy models (essential for dashboard)
+COPY models/distilbert/ ./models/distilbert/
+COPY models/logistic_regression/ ./models/logistic_regression/
+
+# Copy processed data for reference
+COPY data/processed/ ./data/processed/
+
+# Create database directory with proper permissions
+RUN mkdir -p data/database && \
+    chmod 755 data/database
+
+# Create logs directory
+RUN mkdir -p logs
+
+# Install the package
+COPY setup.py params.yaml readme.md ./
+RUN pip install -e .
+
+# Expose Streamlit port
+EXPOSE 7860
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:7860/_stcore/health || exit 1
+
+# Run Streamlit
+CMD ["streamlit", "run", "src/dashboard/streamlit_app.py", \
+     "--server.port=7860", \
+     "--server.address=0.0.0.0", \
+     "--server.headless=true", \
+     "--browser.gatherUsageStats=false"]
