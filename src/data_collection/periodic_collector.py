@@ -113,6 +113,44 @@ class PeriodicDataCollector:
 
         return existing_hashes
 
+    def _collect_movie_data_batch(
+        self, movies: list, subreddits: list, reddit_data: list
+    ) -> None:
+        """Collect data for a batch of movies."""
+        for movie in movies[:3]:
+            try:
+                movie_data = self.reddit_collector.collect_movie_data(
+                    movie_title=movie,
+                    subreddits=subreddits[:2],
+                    posts_per_subreddit=20,
+                    comments_per_post=10,
+                )
+                if len(movie_data) > 0:
+                    reddit_data.append(movie_data)
+                    logger.info(f"Collected {len(movie_data)} samples for '{movie}'")
+            except Exception as e:
+                logger.warning(f"Failed to collect data for '{movie}': {e}")
+
+    def _process_reddit_data(
+        self, reddit_data: list, max_reddit_samples: int, duplicates_skipped: int
+    ) -> tuple:
+        """Process and deduplicate Reddit data."""
+        if not reddit_data:
+            return 0, None, duplicates_skipped
+
+        reddit_df = pd.concat(reddit_data, ignore_index=True)
+        initial_count = len(reddit_df)
+        reddit_df = reddit_df[~reddit_df["hash"].isin(self.existing_hashes)]
+        duplicates_skipped += initial_count - len(reddit_df)
+
+        if len(reddit_df) > max_reddit_samples:
+            reddit_df = reddit_df.sample(n=max_reddit_samples, random_state=42)
+            logger.info(f"Limited Reddit samples to {max_reddit_samples}")
+
+        reddit_samples = len(reddit_df)
+        logger.info(f"✅ Collected {reddit_samples} new samples from Reddit")
+        return reddit_samples, reddit_df, duplicates_skipped
+
     def _collect_from_reddit(
         self, max_reddit_samples: int, duplicates_skipped: int
     ) -> tuple:
@@ -137,51 +175,20 @@ class PeriodicDataCollector:
             reddit_data = []
 
             # Collect from positive movies
-            for movie in positive_movies[:3]:
-                try:
-                    movie_data = self.reddit_collector.collect_movie_data(
-                        movie_title=movie,
-                        subreddits=subreddits[:2],
-                        posts_per_subreddit=20,
-                        comments_per_post=10,
-                    )
-                    if len(movie_data) > 0:
-                        reddit_data.append(movie_data)
-                        logger.info(
-                            f"Collected {len(movie_data)} samples for '{movie}'"
-                        )
-                except Exception as e:
-                    logger.warning(f"Failed to collect data for '{movie}': {e}")
+            self._collect_movie_data_batch(positive_movies, subreddits, reddit_data)
 
             # Collect from negative movies
-            for movie in negative_movies[:3]:
-                try:
-                    movie_data = self.reddit_collector.collect_movie_data(
-                        movie_title=movie,
-                        subreddits=subreddits[:2],
-                        posts_per_subreddit=20,
-                        comments_per_post=10,
-                    )
-                    if len(movie_data) > 0:
-                        reddit_data.append(movie_data)
-                        logger.info(
-                            f"Collected {len(movie_data)} samples for '{movie}'"
-                        )
-                except Exception as e:
-                    logger.warning(f"Failed to collect data for '{movie}': {e}")
+            self._collect_movie_data_batch(negative_movies, subreddits, reddit_data)
 
+            # Process and deduplicate
             if reddit_data:
-                reddit_df = pd.concat(reddit_data, ignore_index=True)
-                initial_count = len(reddit_df)
-                reddit_df = reddit_df[~reddit_df["hash"].isin(self.existing_hashes)]
-                duplicates_skipped += initial_count - len(reddit_df)
-
-                if len(reddit_df) > max_reddit_samples:
-                    reddit_df = reddit_df.sample(n=max_reddit_samples, random_state=42)
-                    logger.info(f"Limited Reddit samples to {max_reddit_samples}")
-
-                reddit_samples = len(reddit_df)
-                logger.info(f"✅ Collected {reddit_samples} new samples from Reddit")
+                (
+                    reddit_samples,
+                    reddit_df,
+                    duplicates_skipped,
+                ) = self._process_reddit_data(
+                    reddit_data, max_reddit_samples, duplicates_skipped
+                )
             else:
                 logger.warning("⚠️ No Reddit data collected")
 
