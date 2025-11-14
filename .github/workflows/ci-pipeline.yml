@@ -45,6 +45,9 @@ jobs:
           flake8 src/ --count --max-complexity=10 --max-line-length=127 --statistics
         continue-on-error: true
 
+      - name: Format files with black (auto-fix)
+        run: black src/ scripts/ || true
+
       - name: Format check with black
         run: black --check src/ scripts/
         continue-on-error: true
