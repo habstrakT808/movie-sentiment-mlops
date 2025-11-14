@@ -1,4 +1,5 @@
 """Generate Phase 1 completion summary."""
+
 import json
 from datetime import datetime
 

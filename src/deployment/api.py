@@ -524,9 +524,11 @@ async def predict_sentiment(request: PredictionRequest):
             confidence=result["confidence"],
             model=result["model"],
             inference_time=result.get("inference_time"),
-            prediction_probabilities=result.get("prediction_probabilities")
-            if request.include_probabilities
-            else None,
+            prediction_probabilities=(
+                result.get("prediction_probabilities")
+                if request.include_probabilities
+                else None
+            ),
         )
 
         logger.info(
@@ -579,9 +581,11 @@ async def predict_batch_sentiment(request: BatchPredictionRequest):
                 confidence=result["confidence"],
                 model=result["model"],
                 inference_time=result.get("inference_time"),
-                prediction_probabilities=result.get("prediction_probabilities")
-                if request.include_probabilities
-                else None,
+                prediction_probabilities=(
+                    result.get("prediction_probabilities")
+                    if request.include_probabilities
+                    else None
+                ),
             )
 
             predictions.append(pred_response)
@@ -797,9 +801,11 @@ async def manual_retrain():
                 "model_version": results["model_version"],
                 "feedback_samples": results["feedback_samples"],
                 "training_time": results["training_time"],
-                "note": "Please restart API to load new model if deployed"
-                if results["should_deploy"]
-                else None,
+                "note": (
+                    "Please restart API to load new model if deployed"
+                    if results["should_deploy"]
+                    else None
+                ),
             }
         else:
             return {

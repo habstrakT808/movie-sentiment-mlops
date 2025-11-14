@@ -85,9 +85,9 @@ class RedditCollector:
                     "upvote_ratio": submission.upvote_ratio,
                     "num_comments": submission.num_comments,
                     "created_utc": datetime.fromtimestamp(submission.created_utc),
-                    "author": str(submission.author)
-                    if submission.author
-                    else "[deleted]",
+                    "author": (
+                        str(submission.author) if submission.author else "[deleted]"
+                    ),
                     "subreddit": subreddit_name,
                     "url": f"https://reddit.com{submission.permalink}",
                     "movie_title": movie_title,

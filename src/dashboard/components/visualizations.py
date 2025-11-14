@@ -245,7 +245,7 @@ def create_predictions_timeline(df: pd.DataFrame) -> go.Figure:
 
 
 def create_model_comparison_bar(
-    model_metrics: Dict[str, Dict[str, float]]
+    model_metrics: Dict[str, Dict[str, float]],
 ) -> go.Figure:
     """
     Create model comparison bar chart.

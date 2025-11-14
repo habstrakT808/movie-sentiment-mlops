@@ -1,4 +1,5 @@
 """Data validation script."""
+
 import pandas as pd
 
 from src.utils.config import Config

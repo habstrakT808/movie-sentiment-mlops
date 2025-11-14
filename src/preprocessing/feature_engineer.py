@@ -69,9 +69,11 @@ class FeatureEngineer:
         features["char_count"] = texts.apply(len)
         features["word_count"] = texts.apply(lambda x: len(str(x).split()))
         features["avg_word_length"] = texts.apply(
-            lambda x: np.mean([len(word) for word in str(x).split()])
-            if len(str(x).split()) > 0
-            else 0
+            lambda x: (
+                np.mean([len(word) for word in str(x).split()])
+                if len(str(x).split()) > 0
+                else 0
+            )
         )
 
         # Sentence features
@@ -110,9 +112,11 @@ class FeatureEngineer:
 
         # Word diversity (unique words / total words)
         features["unique_word_ratio"] = texts.apply(
-            lambda x: len(set(str(x).lower().split())) / len(str(x).split())
-            if len(str(x).split()) > 0
-            else 0
+            lambda x: (
+                len(set(str(x).lower().split())) / len(str(x).split())
+                if len(str(x).split()) > 0
+                else 0
+            )
         )
 
         # Handle any NaN or inf values
