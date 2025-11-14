@@ -1,0 +1,138 @@
+name: Data Collection Pipeline
+
+on:
+  schedule:
+    # Weekly on Sunday at midnight UTC
+    - cron: "0 0 * * 0"
+  workflow_dispatch:
+    inputs:
+      source:
+        description: "Data source to collect from"
+        required: false
+        default: "all"
+        type: choice
+        options:
+          - all
+          - reddit
+          - kaggle
+
+jobs:
+  collect-data:
+    name: Collect New Data
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Set up DVC
+        run: |
+          pip install dvc[s3]
+          # Configure DVC (if using remote storage)
+          # dvc remote add -d myremote s3://mybucket/path
+
+      - name: Pull latest data
+        run: |
+          dvc pull || echo "No DVC remote configured, skipping pull"
+
+      - name: Collect new data from Reddit
+        if: |
+          github.event_name == 'schedule' ||
+          (github.event_name == 'workflow_dispatch' &&
+           (github.event.inputs.source == 'all' || github.event.inputs.source == 'reddit'))
+        env:
+          REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
+          REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
+          REDDIT_USER_AGENT: ${{ secrets.REDDIT_USER_AGENT }}
+        run: |
+          python -c "
+          from src.data_collection.periodic_collector import PeriodicDataCollector
+          collector = PeriodicDataCollector()
+          result = collector.collect_incremental_data(
+              min_samples_per_source=50,
+              time_filter='week',
+              max_reddit_samples=500,
+              max_kaggle_samples=200
+          )
+          print(f'Collected {result.get(\"total_new_samples\", 0)} new samples')
+          "
+
+      - name: Collect new data from Kaggle
+        if: |
+          github.event_name == 'schedule' ||
+          (github.event_name == 'workflow_dispatch' &&
+           (github.event.inputs.source == 'all' || github.event.inputs.source == 'kaggle'))
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+        run: |
+          python -c "
+          from src.data_collection.periodic_collector import PeriodicDataCollector
+          collector = PeriodicDataCollector()
+          result = collector.collect_incremental_data(
+              min_samples_per_source=50,
+              time_filter='week',
+              max_reddit_samples=0,
+              max_kaggle_samples=500
+          )
+          print(f'Collected {result.get(\"total_new_samples\", 0)} new samples')
+          "
+
+      - name: Validate collected data
+        run: |
+          python -c "
+          import pandas as pd
+          from pathlib import Path
+          import glob
+
+          incremental_dir = Path('data/raw/incremental')
+          csv_files = list(incremental_dir.glob('*.csv'))
+
+          if csv_files:
+              latest_file = max(csv_files, key=lambda p: p.stat().st_mtime)
+              df = pd.read_csv(latest_file)
+
+              # Basic validation
+              assert len(df) > 0, 'No data collected'
+              assert 'text' in df.columns, 'Missing text column'
+              assert 'sentiment' in df.columns, 'Missing sentiment column'
+
+              print(f'✅ Validated {len(df)} samples from {latest_file.name}')
+          else:
+              print('⚠️ No new data files found')
+          "
+
+      - name: Update DVC
+        if: success()
+        run: |
+          dvc add data/raw/incremental/ || echo "No new files to add"
+          dvc push || echo "No DVC remote configured"
+
+      - name: Commit and push changes
+        if: success()
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add data/raw/incremental/.gitignore data/raw/incremental/*.dvc || true
+          git diff --staged --quiet || git commit -m "chore: Update data collection [skip ci]"
+          git push || echo "No changes to commit"
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Data Collection Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Trigger: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Source: ${{ github.event.inputs.source || 'all' }}" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,114 @@
+name: Deployment Pipeline
+
+on:
+  workflow_run:
+    workflows: ["Model Training Pipeline"]
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      build_docker:
+        description: "Build Docker images"
+        required: false
+        default: true
+        type: boolean
+      test_containers:
+        description: "Test containers"
+        required: false
+        default: true
+        type: boolean
+
+jobs:
+  build-and-test:
+    name: Build & Test Docker Images
+    runs-on: ubuntu-latest
+    if: |
+      github.event.workflow_run.conclusion == 'success' ||
+      github.event_name == 'workflow_dispatch'
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build API Docker image
+        if: |
+          github.event.inputs.build_docker != 'false' ||
+          github.event_name == 'workflow_run'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/Dockerfile.api
+          push: false
+          tags: movie-sentiment-api:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build Dashboard Docker image
+        if: |
+          github.event.inputs.build_docker != 'false' ||
+          github.event_name == 'workflow_run'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/Dockerfile.dashboard
+          push: false
+          tags: movie-sentiment-dashboard:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Test containers
+        if: |
+          github.event.inputs.test_containers != 'false' ||
+          github.event_name == 'workflow_run'
+        run: |
+          # Start services (only API and Dashboard for testing)
+          cd docker
+          docker-compose up -d sentiment-api sentiment-dashboard
+
+          # Wait for services to be ready
+          echo "Waiting for services to start..."
+          sleep 30
+
+          # Health checks
+          echo "Checking API health..."
+          curl -f http://localhost:8000/health || exit 1
+
+          echo "Checking Dashboard health..."
+          curl -f http://localhost:8501/_stcore/health || exit 1
+
+          # Test prediction endpoint
+          echo "Testing prediction endpoint..."
+          curl -X POST http://localhost:8000/predict \
+            -H "Content-Type: application/json" \
+            -d '{"text": "This movie is great!"}' || exit 1
+
+          # Cleanup
+          docker-compose down
+
+      - name: Save Docker images
+        if: success()
+        run: |
+          docker save movie-sentiment-api:latest | gzip > api-image.tar.gz
+          docker save movie-sentiment-dashboard:latest | gzip > dashboard-image.tar.gz
+
+      - name: Upload Docker images
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker-images
+          path: |
+            api-image.tar.gz
+            dashboard-image.tar.gz
+          retention-days: 7
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Docker Build: ${{ github.event.inputs.build_docker != 'false' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Container Test: ${{ github.event.inputs.test_containers != 'false' }}" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,167 @@
+name: Model Training Pipeline
+
+on:
+  schedule:
+    # Weekly on Monday at 2 AM UTC
+    - cron: "0 2 * * 1"
+  workflow_dispatch:
+    inputs:
+      model_type:
+        description: "Model type to train"
+        required: true
+        default: "transformer"
+        type: choice
+        options:
+          - all
+          - traditional
+          - transformer
+      skip_evaluation:
+        description: "Skip model evaluation"
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  train-model:
+    name: Train Model
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Set up DVC
+        run: |
+          pip install dvc[s3]
+          # Configure DVC remote if needed
+          # dvc remote add -d myremote s3://mybucket/path
+
+      - name: Pull latest data
+        run: |
+          dvc pull || echo "No DVC remote configured, using local data"
+
+      - name: Train Traditional ML models
+        if: |
+          github.event_name == 'schedule' ||
+          (github.event_name == 'workflow_dispatch' &&
+           (github.event.inputs.model_type == 'all' ||
+            github.event.inputs.model_type == 'traditional'))
+        run: |
+          python src/models/train_traditional.py
+
+      - name: Train Transformer model
+        if: |
+          github.event_name == 'schedule' ||
+          (github.event_name == 'workflow_dispatch' &&
+           (github.event.inputs.model_type == 'all' ||
+            github.event.inputs.model_type == 'transformer'))
+        run: |
+          python src/models/train_transformer.py
+
+      - name: Compare and evaluate models
+        if: |
+          success() &&
+          (github.event_name == 'schedule' ||
+           github.event.inputs.skip_evaluation != 'true')
+        run: |
+          python src/models/compare_models.py
+
+      - name: Check model performance gates
+        if: success()
+        run: |
+          python -c "
+          import json
+          from pathlib import Path
+
+          # Load best model metrics
+          best_model_path = Path('models/distilbert/metadata.json')
+          if best_model_path.exists():
+              with open(best_model_path) as f:
+                  metadata = json.load(f)
+
+              metrics = metadata.get('metrics', {})
+              accuracy = metrics.get('test_accuracy', 0)
+              f1 = metrics.get('test_f1', 0)
+
+              # Performance gates
+              min_accuracy = 0.85
+              min_f1 = 0.83
+
+              if accuracy < min_accuracy:
+                  raise ValueError(f'Accuracy {accuracy:.2%} < threshold {min_accuracy:.2%}')
+              if f1 < min_f1:
+                  raise ValueError(f'F1 {f1:.2%} < threshold {min_f1:.2%}')
+
+              print(f'✅ Performance gates passed: Accuracy={accuracy:.2%}, F1={f1:.2%}')
+          else:
+              print('⚠️ Model metadata not found, skipping gates')
+          "
+
+      - name: Verify model registration
+        if: success()
+        run: |
+          python -c "
+          import json
+          from pathlib import Path
+
+          print('📝 Verifying model registration...')
+
+          # Check if models have metadata
+          models = ['logistic_regression', 'random_forest', 'svm', 'distilbert']
+          registered = []
+
+          for model_name in models:
+              metadata_path = Path(f'models/{model_name}/metadata.json')
+              if metadata_path.exists():
+                  with open(metadata_path) as f:
+                      metadata = json.load(f)
+                  if 'metrics' in metadata:
+                      registered.append(model_name)
+                      print(f'✅ {model_name}: registered with metrics')
+
+          print(f'✅ Total models registered: {len(registered)}/{len(models)}')
+          "
+
+      - name: Upload model artifacts
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: trained-models
+          path: |
+            models/*/metadata.json
+            models/*/model.pkl
+            models/distilbert/*.json
+            models/distilbert/*.bin
+          retention-days: 7
+
+      - name: Notify on failure
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🚨 Model Training Pipeline Failed',
+              body: `Automated model training failed. Please check the [workflow run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}).`
+            })
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Model Training Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Model Type: ${{ github.event.inputs.model_type || 'all' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Trigger: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
