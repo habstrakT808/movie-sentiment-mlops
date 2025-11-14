@@ -265,6 +265,36 @@ class RedditCollector:
 
         return df
 
+    def _collect_sentiment_data(
+        self,
+        movies: List[str],
+        sentiment: str,
+        subreddits: List[str],
+        target_count: int,
+        all_data: list,
+        sentiment_counts: dict,
+    ) -> None:
+        """Collect data for a specific sentiment."""
+        logger.info(f"Collecting {sentiment} reviews...")
+        for movie in movies:
+            if sentiment_counts[sentiment] >= target_count:
+                break
+
+            df = self.collect_movie_data(
+                movie_title=movie,
+                subreddits=subreddits,
+                posts_per_subreddit=100,
+                comments_per_post=20,
+            )
+
+            if len(df) > 0:
+                filtered_df = df[df["sentiment"] == sentiment]
+                all_data.append(filtered_df)
+                sentiment_counts[sentiment] += len(filtered_df)
+                logger.info(
+                    f"{sentiment.capitalize()}: {sentiment_counts[sentiment]}/{target_count}"
+                )
+
     @timer
     def collect_balanced_dataset(
         self,
@@ -293,73 +323,34 @@ class RedditCollector:
         sentiment_counts = {"positive": 0, "negative": 0, "neutral": 0}
 
         # Collect positive reviews
-        logger.info("Collecting positive reviews...")
-        for movie in positive_movies:
-            if sentiment_counts["positive"] >= target_per_sentiment:
-                break
-
-            df = self.collect_movie_data(
-                movie_title=movie,
-                subreddits=subreddits,
-                posts_per_subreddit=100,
-                comments_per_post=20,
-            )
-
-            if len(df) > 0:
-                # Filter for positive sentiment
-                positive_df = df[df["sentiment"] == "positive"]
-                all_data.append(positive_df)
-                sentiment_counts["positive"] += len(positive_df)
-
-                logger.info(
-                    f"Positive: {sentiment_counts['positive']}/{target_per_sentiment}"
-                )
+        self._collect_sentiment_data(
+            positive_movies,
+            "positive",
+            subreddits,
+            target_per_sentiment,
+            all_data,
+            sentiment_counts,
+        )
 
         # Collect negative reviews
-        logger.info("Collecting negative reviews...")
-        for movie in negative_movies:
-            if sentiment_counts["negative"] >= target_per_sentiment:
-                break
-
-            df = self.collect_movie_data(
-                movie_title=movie,
-                subreddits=subreddits,
-                posts_per_subreddit=100,
-                comments_per_post=20,
-            )
-
-            if len(df) > 0:
-                # Filter for negative sentiment
-                negative_df = df[df["sentiment"] == "negative"]
-                all_data.append(negative_df)
-                sentiment_counts["negative"] += len(negative_df)
-
-                logger.info(
-                    f"Negative: {sentiment_counts['negative']}/{target_per_sentiment}"
-                )
+        self._collect_sentiment_data(
+            negative_movies,
+            "negative",
+            subreddits,
+            target_per_sentiment,
+            all_data,
+            sentiment_counts,
+        )
 
         # Collect neutral reviews
-        logger.info("Collecting neutral reviews...")
-        for movie in neutral_movies:
-            if sentiment_counts["neutral"] >= target_per_sentiment:
-                break
-
-            df = self.collect_movie_data(
-                movie_title=movie,
-                subreddits=subreddits,
-                posts_per_subreddit=100,
-                comments_per_post=20,
-            )
-
-            if len(df) > 0:
-                # Filter for neutral sentiment
-                neutral_df = df[df["sentiment"] == "neutral"]
-                all_data.append(neutral_df)
-                sentiment_counts["neutral"] += len(neutral_df)
-
-                logger.info(
-                    f"Neutral: {sentiment_counts['neutral']}/{target_per_sentiment}"
-                )
+        self._collect_sentiment_data(
+            neutral_movies,
+            "neutral",
+            subreddits,
+            target_per_sentiment,
+            all_data,
+            sentiment_counts,
+        )
 
         # Combine all data
         if all_data:

@@ -113,6 +113,128 @@ class PeriodicDataCollector:
 
         return existing_hashes
 
+    def _collect_from_reddit(
+        self, max_reddit_samples: int, duplicates_skipped: int
+    ) -> tuple:
+        """Collect data from Reddit."""
+        reddit_samples = 0
+        reddit_df = None
+
+        if self.reddit_collector is None:
+            return reddit_samples, reddit_df, duplicates_skipped
+
+        try:
+            logger.info("\n" + "-" * 80)
+            logger.info("PHASE 1: Collecting from Reddit")
+            logger.info("-" * 80)
+
+            positive_movies = self.data_params.get("positive_movies", [])
+            negative_movies = self.data_params.get("negative_movies", [])
+            subreddits = self.data_params.get("reddit", {}).get(
+                "subreddits", ["movies"]
+            )
+
+            reddit_data = []
+
+            # Collect from positive movies
+            for movie in positive_movies[:3]:
+                try:
+                    movie_data = self.reddit_collector.collect_movie_data(
+                        movie_title=movie,
+                        subreddits=subreddits[:2],
+                        posts_per_subreddit=20,
+                        comments_per_post=10,
+                    )
+                    if len(movie_data) > 0:
+                        reddit_data.append(movie_data)
+                        logger.info(
+                            f"Collected {len(movie_data)} samples for '{movie}'"
+                        )
+                except Exception as e:
+                    logger.warning(f"Failed to collect data for '{movie}': {e}")
+
+            # Collect from negative movies
+            for movie in negative_movies[:3]:
+                try:
+                    movie_data = self.reddit_collector.collect_movie_data(
+                        movie_title=movie,
+                        subreddits=subreddits[:2],
+                        posts_per_subreddit=20,
+                        comments_per_post=10,
+                    )
+                    if len(movie_data) > 0:
+                        reddit_data.append(movie_data)
+                        logger.info(
+                            f"Collected {len(movie_data)} samples for '{movie}'"
+                        )
+                except Exception as e:
+                    logger.warning(f"Failed to collect data for '{movie}': {e}")
+
+            if reddit_data:
+                reddit_df = pd.concat(reddit_data, ignore_index=True)
+                initial_count = len(reddit_df)
+                reddit_df = reddit_df[~reddit_df["hash"].isin(self.existing_hashes)]
+                duplicates_skipped += initial_count - len(reddit_df)
+
+                if len(reddit_df) > max_reddit_samples:
+                    reddit_df = reddit_df.sample(n=max_reddit_samples, random_state=42)
+                    logger.info(f"Limited Reddit samples to {max_reddit_samples}")
+
+                reddit_samples = len(reddit_df)
+                logger.info(f"✅ Collected {reddit_samples} new samples from Reddit")
+            else:
+                logger.warning("⚠️ No Reddit data collected")
+
+        except Exception as e:
+            logger.error(f"❌ Reddit collection failed: {e}")
+            import traceback
+
+            logger.error(traceback.format_exc())
+
+        return reddit_samples, reddit_df, duplicates_skipped
+
+    def _collect_from_kaggle(
+        self, max_kaggle_samples: int, duplicates_skipped: int
+    ) -> tuple:
+        """Collect data from Kaggle."""
+        kaggle_samples = 0
+        kaggle_df = None
+
+        if self.kaggle_downloader is None:
+            return kaggle_samples, kaggle_df, duplicates_skipped
+
+        try:
+            logger.info("\n" + "-" * 80)
+            logger.info("PHASE 2: Collecting from Kaggle")
+            logger.info("-" * 80)
+
+            kaggle_df = self.kaggle_downloader.get_balanced_kaggle_data(
+                output_dir=Config.EXTERNAL_DATA_DIR,
+                target_per_sentiment=max_kaggle_samples // 2,
+            )
+
+            if len(kaggle_df) > 0:
+                initial_count = len(kaggle_df)
+                kaggle_df = kaggle_df[~kaggle_df["hash"].isin(self.existing_hashes)]
+                duplicates_skipped += initial_count - len(kaggle_df)
+
+                if len(kaggle_df) > max_kaggle_samples:
+                    kaggle_df = kaggle_df.sample(n=max_kaggle_samples, random_state=42)
+                    logger.info(f"Limited Kaggle samples to {max_kaggle_samples}")
+
+                kaggle_samples = len(kaggle_df)
+                logger.info(f"✅ Collected {kaggle_samples} new samples from Kaggle")
+            else:
+                logger.warning("⚠️ No Kaggle data collected")
+
+        except Exception as e:
+            logger.error(f"❌ Kaggle collection failed: {e}")
+            import traceback
+
+            logger.error(traceback.format_exc())
+
+        return kaggle_samples, kaggle_df, duplicates_skipped
+
     @timer
     def collect_incremental_data(
         self,
@@ -138,135 +260,21 @@ class PeriodicDataCollector:
         logger.info("=" * 80)
 
         all_new_data = []
-        reddit_samples = 0
-        kaggle_samples = 0
         duplicates_skipped = 0
 
-        # ========== COLLECT FROM REDDIT ==========
-        if self.reddit_collector is not None:
-            try:
-                logger.info("\n" + "-" * 80)
-                logger.info("PHASE 1: Collecting from Reddit")
-                logger.info("-" * 80)
+        # Collect from Reddit
+        reddit_samples, reddit_df, duplicates_skipped = self._collect_from_reddit(
+            max_reddit_samples, duplicates_skipped
+        )
+        if reddit_df is not None:
+            all_new_data.append(reddit_df)
 
-                # Get movie lists from config
-                positive_movies = self.data_params.get("positive_movies", [])
-                negative_movies = self.data_params.get("negative_movies", [])
-                subreddits = self.data_params.get("reddit", {}).get(
-                    "subreddits", ["movies"]
-                )
-
-                # Collect from recent posts (smaller sample for periodic collection)
-                reddit_data = []
-
-                # Collect from positive movies
-                for movie in positive_movies[
-                    :3
-                ]:  # Limit to 3 movies for periodic collection
-                    try:
-                        movie_data = self.reddit_collector.collect_movie_data(
-                            movie_title=movie,
-                            subreddits=subreddits[:2],  # Limit subreddits
-                            posts_per_subreddit=20,  # Smaller limit
-                            comments_per_post=10,
-                        )
-                        if len(movie_data) > 0:
-                            reddit_data.append(movie_data)
-                            logger.info(
-                                f"Collected {len(movie_data)} samples for '{movie}'"
-                            )
-                    except Exception as e:
-                        logger.warning(f"Failed to collect data for '{movie}': {e}")
-                        continue
-
-                # Collect from negative movies
-                for movie in negative_movies[:3]:
-                    try:
-                        movie_data = self.reddit_collector.collect_movie_data(
-                            movie_title=movie,
-                            subreddits=subreddits[:2],
-                            posts_per_subreddit=20,
-                            comments_per_post=10,
-                        )
-                        if len(movie_data) > 0:
-                            reddit_data.append(movie_data)
-                            logger.info(
-                                f"Collected {len(movie_data)} samples for '{movie}'"
-                            )
-                    except Exception as e:
-                        logger.warning(f"Failed to collect data for '{movie}': {e}")
-                        continue
-
-                # Combine Reddit data
-                if reddit_data:
-                    reddit_df = pd.concat(reddit_data, ignore_index=True)
-
-                    # Filter by time (if time_filter is used)
-                    # Note: RedditCollector doesn't support time_filter directly,
-                    # but we can filter by created_utc if needed
-
-                    # Remove duplicates
-                    initial_reddit_count = len(reddit_df)
-                    reddit_df = reddit_df[~reddit_df["hash"].isin(self.existing_hashes)]
-                    duplicates_skipped += initial_reddit_count - len(reddit_df)
-
-                    # Limit samples
-                    if len(reddit_df) > max_reddit_samples:
-                        reddit_df = reddit_df.sample(
-                            n=max_reddit_samples, random_state=42
-                        )
-                        logger.info(f"Limited Reddit samples to {max_reddit_samples}")
-
-                    reddit_samples = len(reddit_df)
-                    all_new_data.append(reddit_df)
-                    logger.info(f"✅ Collected {reddit_samples} new samples from Reddit")
-                else:
-                    logger.warning("⚠️ No Reddit data collected")
-
-            except Exception as e:
-                logger.error(f"❌ Reddit collection failed: {e}")
-                import traceback
-
-                logger.error(traceback.format_exc())
-
-        # ========== COLLECT FROM KAGGLE ==========
-        if self.kaggle_downloader is not None:
-            try:
-                logger.info("\n" + "-" * 80)
-                logger.info("PHASE 2: Collecting from Kaggle")
-                logger.info("-" * 80)
-
-                # Download and process Kaggle data
-                kaggle_df = self.kaggle_downloader.get_balanced_kaggle_data(
-                    output_dir=Config.EXTERNAL_DATA_DIR,
-                    target_per_sentiment=max_kaggle_samples
-                    // 2,  # Divide by 2 for pos/neg
-                )
-
-                if len(kaggle_df) > 0:
-                    # Remove duplicates
-                    initial_kaggle_count = len(kaggle_df)
-                    kaggle_df = kaggle_df[~kaggle_df["hash"].isin(self.existing_hashes)]
-                    duplicates_skipped += initial_kaggle_count - len(kaggle_df)
-
-                    # Limit samples
-                    if len(kaggle_df) > max_kaggle_samples:
-                        kaggle_df = kaggle_df.sample(
-                            n=max_kaggle_samples, random_state=42
-                        )
-                        logger.info(f"Limited Kaggle samples to {max_kaggle_samples}")
-
-                    kaggle_samples = len(kaggle_df)
-                    all_new_data.append(kaggle_df)
-                    logger.info(f"✅ Collected {kaggle_samples} new samples from Kaggle")
-                else:
-                    logger.warning("⚠️ No Kaggle data collected")
-
-            except Exception as e:
-                logger.error(f"❌ Kaggle collection failed: {e}")
-                import traceback
-
-                logger.error(traceback.format_exc())
+        # Collect from Kaggle
+        kaggle_samples, kaggle_df, duplicates_skipped = self._collect_from_kaggle(
+            max_kaggle_samples, duplicates_skipped
+        )
+        if kaggle_df is not None:
+            all_new_data.append(kaggle_df)
 
         # ========== COMBINE AND FINALIZE ==========
         if not all_new_data:

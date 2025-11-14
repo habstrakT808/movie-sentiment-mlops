@@ -42,7 +42,7 @@ jobs:
 
       - name: Lint with flake8 (warnings)
         run: |
-          flake8 src/ --count --max-complexity=10 --max-line-length=127 --statistics
+          flake8 src/ --count --max-complexity=10 --max-line-length=127 --extend-ignore=E203 --statistics
         continue-on-error: true
 
       - name: Format files with black (auto-fix)
