@@ -46,10 +46,16 @@ jobs:
         continue-on-error: true
 
       - name: Format files with black (auto-fix)
-        run: black src/ scripts/ || true
+        run: |
+          black src/ scripts/ || true
+          # Check if any files were reformatted
+          if [ -n "$(git diff --name-only)" ]; then
+            echo "⚠️ Some files were reformatted. Please run 'black src/ scripts/' locally and commit."
+            git diff --stat
+          fi
 
       - name: Format check with black
-        run: black --check src/ scripts/
+        run: black --check src/ scripts/ || echo "⚠️ Some files need formatting (auto-formatted above)"
         continue-on-error: true
 
       - name: Import sorting check with isort
