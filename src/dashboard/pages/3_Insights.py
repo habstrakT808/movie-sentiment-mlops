@@ -21,12 +21,378 @@ logger = get_logger(__name__)
 
 st.set_page_config(page_title="Data Insights", page_icon="📈", layout="wide")
 
-# Title
-st.title("📈 Data Insights & Analytics")
+# Enhanced Custom CSS with Animations
 st.markdown(
     """
-Explore dataset statistics, sentiment distributions, and prediction patterns.
-"""
+<style>
+    /* Import Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+
+    /* Global Styles */
+    * {
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* Main theme */
+    .main {
+        background: linear-gradient(135deg, #0E1117 0%, #1a1d29 100%);
+    }
+
+    /* Headers with gradient text */
+    h1 {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 800;
+        padding-bottom: 1rem;
+        border-bottom: 3px solid;
+        border-image: linear-gradient(90deg, #667eea, #764ba2) 1;
+        animation: fadeInDown 0.8s ease-out;
+    }
+
+    h2 {
+        color: #FAFAFA;
+        font-weight: 700;
+        margin-top: 2rem;
+        animation: fadeIn 1s ease-out;
+    }
+
+    h3 {
+        color: #FAFAFA;
+        font-weight: 600;
+    }
+
+    /* Hero Section */
+    .hero-section {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        border-radius: 20px;
+        padding: 3rem 2rem;
+        margin: 2rem 0;
+        border: 1px solid rgba(102, 126, 234, 0.3);
+        box-shadow: 0 8px 32px rgba(102, 126, 234, 0.1);
+        animation: fadeInUp 1s ease-out;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+        animation: pulse 4s ease-in-out infinite;
+    }
+
+    .hero-title {
+        font-size: 3rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+        animation: gradientShift 3s ease infinite;
+        background-size: 200% auto;
+    }
+
+    .hero-subtitle {
+        font-size: 1.3rem;
+        color: #B0B0B0;
+        margin-bottom: 2rem;
+        font-weight: 400;
+    }
+
+    /* Glassmorphism Cards */
+    .glass-card {
+        background: rgba(38, 39, 48, 0.7);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.6s ease-out;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .glass-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        transition: left 0.5s;
+    }
+
+    .glass-card:hover::before {
+        left: 100%;
+    }
+
+    .glass-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 48px rgba(102, 126, 234, 0.2);
+        border-color: rgba(102, 126, 234, 0.5);
+    }
+
+    /* Buttons */
+    .stButton > button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 0.75rem 2rem;
+        font-weight: 700;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .stButton > button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    }
+
+    /* Sidebar Enhancements */
+    .css-1d391kg, [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #1a1d29 0%, #0E1117 100%) !important;
+        border-right: 1px solid rgba(102, 126, 234, 0.2);
+    }
+
+    /* Disable scroll only for navigation links section (Predict, Performance, Insights) */
+    [data-testid="stSidebar"] nav,
+    [data-testid="stSidebar"] > div > nav,
+    [data-testid="stSidebar"] [class*="css-"] nav,
+    [data-testid="stSidebar"] section[data-testid="stSidebarNav"] {
+        overflow-y: hidden !important;
+        overflow-x: hidden !important;
+        max-height: fit-content !important;
+        height: auto !important;
+    }
+
+    [data-testid="stSidebar"] nav > div,
+    [data-testid="stSidebar"] nav > ul,
+    [data-testid="stSidebar"] nav > section {
+        overflow-y: hidden !important;
+        overflow-x: hidden !important;
+    }
+
+    [data-testid="stSidebar"] nav::-webkit-scrollbar,
+    [data-testid="stSidebar"] [class*="css-"] nav::-webkit-scrollbar,
+    [data-testid="stSidebar"] section[data-testid="stSidebarNav"]::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
+
+    [data-testid="stSidebar"] nav,
+    [data-testid="stSidebar"] [class*="css-"] nav,
+    [data-testid="stSidebar"] section[data-testid="stSidebarNav"] {
+        -ms-overflow-style: none !important;
+        scrollbar-width: none !important;
+    }
+
+    [data-testid="stSidebar"] .element-container {
+        animation: fadeInLeft 0.5s ease-out;
+    }
+
+    /* Sidebar Navigation Links */
+    [data-testid="stSidebar"] a {
+        color: #B0B0B0 !important;
+        text-decoration: none;
+        padding: 0.75rem 1rem;
+        border-radius: 10px;
+        display: block;
+        transition: all 0.3s ease;
+        margin: 0.25rem 0;
+        font-weight: 500;
+    }
+
+    [data-testid="stSidebar"] a:hover {
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea !important;
+        transform: translateX(5px);
+    }
+
+    /* Active sidebar link */
+    [data-testid="stSidebar"] a[aria-current="page"] {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+        color: #667eea !important;
+        border-left: 3px solid #667eea;
+        font-weight: 700;
+    }
+
+    /* Sidebar Headers */
+    [data-testid="stSidebar"] h3 {
+        color: #FAFAFA;
+        font-weight: 700;
+        font-size: 1rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+    }
+
+    /* Sidebar Dividers */
+    [data-testid="stSidebar"] hr {
+        border: none;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.3), transparent);
+        margin: 1.5rem 0;
+    }
+
+    /* Sidebar Stats Cards */
+    [data-testid="stSidebar"] .stat-card {
+        background: rgba(38, 39, 48, 0.5);
+        border-radius: 12px;
+        padding: 1rem;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+        margin-bottom: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+    [data-testid="stSidebar"] .stat-card:hover {
+        background: rgba(102, 126, 234, 0.1);
+        border-color: rgba(102, 126, 234, 0.4);
+        transform: translateX(3px);
+    }
+
+    /* Success/Error/Info Boxes */
+    .stSuccess {
+        background: rgba(0, 210, 106, 0.1);
+        border-left: 4px solid #00D26A;
+        border-radius: 8px;
+        animation: slideInRight 0.5s ease-out;
+    }
+
+    .stError {
+        background: rgba(255, 75, 75, 0.1);
+        border-left: 4px solid #FF4B4B;
+        border-radius: 8px;
+        animation: shake 0.5s ease-out;
+    }
+
+    .stInfo {
+        background: rgba(102, 126, 234, 0.1);
+        border-left: 4px solid #667eea;
+        border-radius: 8px;
+        animation: slideInRight 0.5s ease-out;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+    }
+
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    /* Hide Streamlit branding */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #1a1d29;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    }
+</style>
+""",
+    unsafe_allow_html=True,
+)
+
+# Hero Section
+st.markdown(
+    """
+<div class="hero-section">
+    <div class="hero-title">📈 Data Insights & Analytics</div>
+    <div class="hero-subtitle">
+        Explore dataset statistics, sentiment distributions, and prediction patterns with interactive visualizations.
+    </div>
+</div>
+""",
+    unsafe_allow_html=True,
 )
 
 

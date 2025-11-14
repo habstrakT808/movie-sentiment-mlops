@@ -231,6 +231,7 @@ st.markdown(
         transition: all 0.3s ease;
         height: 100%;
         cursor: pointer;
+        margin-bottom: 1.5rem;
     }
 
     .feature-card:hover {
@@ -326,6 +327,7 @@ st.markdown(
         cursor: pointer;
         text-align: center;
         height: 100%;
+        color: inherit;
     }
 
     .nav-card:hover {
@@ -334,6 +336,7 @@ st.markdown(
         transform: translateY(-8px);
         box-shadow: 0 12px 40px rgba(102, 126, 234, 0.3);
     }
+
 
     .nav-icon {
         font-size: 4rem;
@@ -363,11 +366,106 @@ st.markdown(
 
     /* Sidebar Enhancements */
     .css-1d391kg, [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #1a1d29 0%, #0E1117 100%);
+        background: linear-gradient(180deg, #1a1d29 0%, #0E1117 100%) !important;
+        border-right: 1px solid rgba(102, 126, 234, 0.2);
+    }
+
+    /* Disable scroll only for navigation links section (Predict, Performance, Insights) */
+    [data-testid="stSidebar"] nav,
+    [data-testid="stSidebar"] > div > nav,
+    [data-testid="stSidebar"] [class*="css-"] nav,
+    [data-testid="stSidebar"] section[data-testid="stSidebarNav"] {
+        overflow-y: hidden !important;
+        overflow-x: hidden !important;
+        max-height: fit-content !important;
+        height: auto !important;
+    }
+
+    [data-testid="stSidebar"] nav > div,
+    [data-testid="stSidebar"] nav > ul,
+    [data-testid="stSidebar"] nav > section {
+        overflow-y: hidden !important;
+        overflow-x: hidden !important;
+    }
+
+    [data-testid="stSidebar"] nav::-webkit-scrollbar,
+    [data-testid="stSidebar"] [class*="css-"] nav::-webkit-scrollbar,
+    [data-testid="stSidebar"] section[data-testid="stSidebarNav"]::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
+
+    [data-testid="stSidebar"] nav,
+    [data-testid="stSidebar"] [class*="css-"] nav,
+    [data-testid="stSidebar"] section[data-testid="stSidebarNav"] {
+        -ms-overflow-style: none !important;
+        scrollbar-width: none !important;
     }
 
     [data-testid="stSidebar"] .element-container {
         animation: fadeInLeft 0.5s ease-out;
+    }
+
+    /* Sidebar Navigation Links */
+    [data-testid="stSidebar"] a {
+        color: #B0B0B0 !important;
+        text-decoration: none;
+        padding: 0.75rem 1rem;
+        border-radius: 10px;
+        display: block;
+        transition: all 0.3s ease;
+        margin: 0.25rem 0;
+        font-weight: 500;
+    }
+
+    [data-testid="stSidebar"] a:hover {
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea !important;
+        transform: translateX(5px);
+    }
+
+    /* Active sidebar link */
+    [data-testid="stSidebar"] a[aria-current="page"] {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+        color: #667eea !important;
+        border-left: 3px solid #667eea;
+        font-weight: 700;
+    }
+
+    /* Sidebar Headers */
+    [data-testid="stSidebar"] h3 {
+        color: #FAFAFA;
+        font-weight: 700;
+        font-size: 1rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+    }
+
+    /* Sidebar Dividers */
+    [data-testid="stSidebar"] hr {
+        border: none;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.3), transparent);
+        margin: 1.5rem 0;
+    }
+
+    /* Sidebar Stats Cards */
+    [data-testid="stSidebar"] .stat-card {
+        background: rgba(38, 39, 48, 0.5);
+        border-radius: 12px;
+        padding: 1rem;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+        margin-bottom: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+    [data-testid="stSidebar"] .stat-card:hover {
+        background: rgba(102, 126, 234, 0.1);
+        border-color: rgba(102, 126, 234, 0.4);
+        transform: translateX(3px);
     }
 
     /* Success/Error/Info Boxes */
@@ -546,7 +644,69 @@ st.markdown(
             font-size: 2rem;
         }
     }
+
+    /* Hide navigation buttons */
+    button[data-testid*="btn_predict"],
+    button[data-testid*="btn_performance"],
+    button[data-testid*="btn_insights"] {
+        opacity: 0 !important;
+        position: absolute !important;
+        z-index: 0 !important;
+        pointer-events: none !important;
+        height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
 </style>
+<script>
+    // Navigation script - runs after page load
+    function setupNavigation() {
+        // Predict card
+        const predictCard = document.getElementById('nav-predict');
+        if (predictCard && !predictCard.dataset.listenerAdded) {
+            predictCard.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                window.location.href = window.location.origin + '/Predict';
+            });
+            predictCard.dataset.listenerAdded = 'true';
+        }
+
+        // Performance card
+        const performanceCard = document.getElementById('nav-performance');
+        if (performanceCard && !performanceCard.dataset.listenerAdded) {
+            performanceCard.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                window.location.href = window.location.origin + '/Performance';
+            });
+            performanceCard.dataset.listenerAdded = 'true';
+        }
+
+        // Insights card
+        const insightsCard = document.getElementById('nav-insights');
+        if (insightsCard && !insightsCard.dataset.listenerAdded) {
+            insightsCard.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                window.location.href = window.location.origin + '/Insights';
+            });
+            insightsCard.dataset.listenerAdded = 'true';
+        }
+    }
+
+    // Try multiple times to ensure elements are loaded
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupNavigation);
+    } else {
+        setupNavigation();
+    }
+
+    // Also try after a delay
+    setTimeout(setupNavigation, 100);
+    setTimeout(setupNavigation, 500);
+    setTimeout(setupNavigation, 1000);
+</script>
 """,
     unsafe_allow_html=True,
 )
@@ -661,11 +821,13 @@ def display_sidebar():
         # Total Predictions
         st.markdown(
             f"""
-        <div style="background: rgba(102, 126, 234, 0.1); padding: 1rem; border-radius: 10px; margin-bottom: 0.5rem;">
-            <div style="font-size: 0.8rem; color: #B0B0B0; text-transform: uppercase; letter-spacing: 1px;">
+        <div class="stat-card" style="background: rgba(102, 126, 234, 0.1);
+            border-color: rgba(102, 126, 234, 0.3);">
+            <div style="font-size: 0.75rem; color: #B0B0B0; text-transform: uppercase;
+                letter-spacing: 1px; margin-bottom: 0.5rem;">
                 Total Predictions
             </div>
-            <div style="font-size: 2rem; font-weight: 800; color: #667eea;">
+            <div style="font-size: 2.5rem; font-weight: 800; color: #667eea; line-height: 1;">
                 {stats['total']}
             </div>
         </div>
@@ -676,11 +838,13 @@ def display_sidebar():
         # Today's Predictions
         st.markdown(
             f"""
-        <div style="background: rgba(0, 210, 106, 0.1); padding: 1rem; border-radius: 10px; margin-bottom: 0.5rem;">
-            <div style="font-size: 0.8rem; color: #B0B0B0; text-transform: uppercase; letter-spacing: 1px;">
+        <div class="stat-card" style="background: rgba(0, 210, 106, 0.1);
+            border-color: rgba(0, 210, 106, 0.3);">
+            <div style="font-size: 0.75rem; color: #B0B0B0; text-transform: uppercase;
+                letter-spacing: 1px; margin-bottom: 0.5rem;">
                 Today
             </div>
-            <div style="font-size: 2rem; font-weight: 800; color: #00D26A;">
+            <div style="font-size: 2.5rem; font-weight: 800; color: #00D26A; line-height: 1;">
                 {stats['today']}
             </div>
         </div>
@@ -691,11 +855,13 @@ def display_sidebar():
         if stats["total"] > 0:
             st.markdown(
                 f"""
-            <div style="background: rgba(255, 165, 0, 0.1); padding: 1rem; border-radius: 10px;">
-                <div style="font-size: 0.8rem; color: #B0B0B0; text-transform: uppercase; letter-spacing: 1px;">
+            <div class="stat-card" style="background: rgba(255, 165, 0, 0.1);
+                border-color: rgba(255, 165, 0, 0.3);">
+                <div style="font-size: 0.75rem; color: #B0B0B0; text-transform: uppercase;
+                    letter-spacing: 1px; margin-bottom: 0.5rem;">
                     Avg Confidence
                 </div>
-                <div style="font-size: 2rem; font-weight: 800; color: #FFA500;">
+                <div style="font-size: 2.5rem; font-weight: 800; color: #FFA500; line-height: 1;">
                     {stats['avg_confidence']:.0%}
                 </div>
             </div>
@@ -773,13 +939,16 @@ def main():
             Harness the power of AI to analyze movie reviews with state-of-the-art deep learning models
         </div>
         <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1;">
-            <div style="background: rgba(0, 210, 106, 0.2); padding: 0.5rem 1.5rem; border-radius: 20px; border: 1px solid rgba(0, 210, 106, 0.3);">  # noqa: E501
+            <div style="background: rgba(0, 210, 106, 0.2); padding: 0.5rem 1.5rem;
+                border-radius: 20px; border: 1px solid rgba(0, 210, 106, 0.3);">
                 <span style="color: #00D26A; font-weight: 700;">✓ 92.50% Accuracy</span>
             </div>
-            <div style="background: rgba(102, 126, 234, 0.2); padding: 0.5rem 1.5rem; border-radius: 20px; border: 1px solid rgba(102, 126, 234, 0.3);">  # noqa: E501
+            <div style="background: rgba(102, 126, 234, 0.2); padding: 0.5rem 1.5rem;
+                border-radius: 20px; border: 1px solid rgba(102, 126, 234, 0.3);">
                 <span style="color: #667eea; font-weight: 700;">⚡ Real-time Analysis</span>
             </div>
-            <div style="background: rgba(255, 165, 0, 0.2); padding: 0.5rem 1.5rem; border-radius: 20px; border: 1px solid rgba(255, 165, 0, 0.3);">  # noqa: E501
+            <div style="background: rgba(255, 165, 0, 0.2); padding: 0.5rem 1.5rem;
+                border-radius: 20px; border: 1px solid rgba(255, 165, 0, 0.3);">
                 <span style="color: #FFA500; font-weight: 700;">🚀 2 AI Models</span>
             </div>
         </div>
@@ -796,7 +965,9 @@ def main():
     with col1:
         st.markdown(
             """
-        <div class="nav-card">
+        <div class="nav-card" id="nav-predict"
+            onclick="window.location.href=window.location.origin+'/Predict'"
+            style="cursor: pointer;">
             <div class="nav-icon">🎯</div>
             <div class="nav-title">Predict</div>
             <div class="nav-description">Analyze movie review sentiment instantly</div>
@@ -808,7 +979,9 @@ def main():
     with col2:
         st.markdown(
             """
-        <div class="nav-card">
+        <div class="nav-card" id="nav-performance"
+            onclick="window.location.href=window.location.origin+'/Performance'"
+            style="cursor: pointer;">
             <div class="nav-icon">📊</div>
             <div class="nav-title">Performance</div>
             <div class="nav-description">Compare model metrics & accuracy</div>
@@ -820,7 +993,9 @@ def main():
     with col3:
         st.markdown(
             """
-        <div class="nav-card">
+        <div class="nav-card" id="nav-insights"
+            onclick="window.location.href=window.location.origin+'/Insights'"
+            style="cursor: pointer;">
             <div class="nav-icon">📈</div>
             <div class="nav-title">Insights</div>
             <div class="nav-description">Explore data analytics & trends</div>
@@ -828,10 +1003,6 @@ def main():
         """,
             unsafe_allow_html=True,
         )
-
-    st.info(
-        "👈 **Use the sidebar** to navigate between different features of the dashboard"
-    )
 
     # Live Statistics
     st.markdown("---")
@@ -943,7 +1114,7 @@ def main():
     with col1:
         st.markdown(
             """
-        <div class="feature-card">
+        <div class="feature-card" style="margin-bottom: 1.5rem;">
             <span class="feature-icon">🤖</span>
             <div class="feature-title">Dual AI Models</div>
             <div class="feature-description">
@@ -957,7 +1128,7 @@ def main():
 
         st.markdown(
             """
-        <div class="feature-card">
+        <div class="feature-card" style="margin-bottom: 1.5rem;">
             <span class="feature-icon">⚡</span>
             <div class="feature-title">Real-time Analysis</div>
             <div class="feature-description">
@@ -971,7 +1142,7 @@ def main():
 
         st.markdown(
             """
-        <div class="feature-card">
+        <div class="feature-card" style="margin-bottom: 1.5rem;">
             <span class="feature-icon">📊</span>
             <div class="feature-title">Performance Metrics</div>
             <div class="feature-description">
@@ -986,7 +1157,7 @@ def main():
     with col2:
         st.markdown(
             """
-        <div class="feature-card">
+        <div class="feature-card" style="margin-bottom: 1.5rem;">
             <span class="feature-icon">📈</span>
             <div class="feature-title">Data Insights</div>
             <div class="feature-description">
@@ -1000,7 +1171,7 @@ def main():
 
         st.markdown(
             """
-        <div class="feature-card">
+        <div class="feature-card" style="margin-bottom: 1.5rem;">
             <span class="feature-icon">💾</span>
             <div class="feature-title">Prediction History</div>
             <div class="feature-description">
@@ -1014,7 +1185,7 @@ def main():
 
         st.markdown(
             """
-        <div class="feature-card">
+        <div class="feature-card" style="margin-bottom: 1.5rem;">
             <span class="feature-icon">🔒</span>
             <div class="feature-title">Privacy First</div>
             <div class="feature-description">
@@ -1081,7 +1252,8 @@ def main():
                     <span style="color: #B0B0B0;">Accuracy</span>
                     <span style="color: #00D26A; font-weight: 700;">92.50%</span>
                 </div>
-                <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden;">  # noqa: E501
+                <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1);
+                    border-radius: 10px; overflow: hidden;">
                     <div style="width: 92.5%; height: 100%; background: linear-gradient(90deg, #00D26A, #00A854);"></div>
                 </div>
             </div>
@@ -1090,13 +1262,16 @@ def main():
                 Excellent at understanding context, nuance, and complex language patterns.
             </p>
             <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                <span style="background: rgba(0, 210, 106, 0.2); color: #00D26A; padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.85rem;">  # noqa: E501
+                <span style="background: rgba(0, 210, 106, 0.2); color: #00D26A;
+                    padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.85rem;">
                     ✓ Best Accuracy
                 </span>
-                <span style="background: rgba(0, 210, 106, 0.2); color: #00D26A; padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.85rem;">  # noqa: E501
+                <span style="background: rgba(0, 210, 106, 0.2); color: #00D26A;
+                    padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.85rem;">
                     ✓ Context Aware
                 </span>
-                <span style="background: rgba(0, 210, 106, 0.2); color: #00D26A; padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.85rem;">  # noqa: E501
+                <span style="background: rgba(0, 210, 106, 0.2); color: #00D26A;
+                    padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.85rem;">
                     ✓ Handles Sarcasm
                 </span>
             </div>
@@ -1115,7 +1290,8 @@ def main():
                     <span style="color: #B0B0B0;">Accuracy</span>
                     <span style="color: #FFA500; font-weight: 700;">87.40%</span>
                 </div>
-                <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden;">  # noqa: E501
+                <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1);
+                    border-radius: 10px; overflow: hidden;">
                     <div style="width: 87.4%; height: 100%; background: linear-gradient(90deg, #FFA500, #CC8400);"></div>
                 </div>
             </div>
@@ -1124,13 +1300,16 @@ def main():
                 Perfect for quick sentiment checks and batch processing.
             </p>
             <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                <span style="background: rgba(255, 165, 0, 0.2); color: #FFA500; padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.85rem;">  # noqa: E501
+                <span style="background: rgba(255, 165, 0, 0.2); color: #FFA500;
+                    padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.85rem;">
                     ⚡ Fast
                 </span>
-                <span style="background: rgba(255, 165, 0, 0.2); color: #FFA500; padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.85rem;">  # noqa: E501
+                <span style="background: rgba(255, 165, 0, 0.2); color: #FFA500;
+                    padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.85rem;">
                     💾 Lightweight
                 </span>
-                <span style="background: rgba(255, 165, 0, 0.2); color: #FFA500; padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.85rem;">  # noqa: E501
+                <span style="background: rgba(255, 165, 0, 0.2); color: #FFA500;
+                    padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.85rem;">
                     📈 Reliable
                 </span>
             </div>
@@ -1143,8 +1322,14 @@ def main():
     st.markdown("---")
     st.markdown(
         """
-    <div style="text-align: center; padding: 3rem 1rem; background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border-radius: 20px; border: 2px solid rgba(102, 126, 234, 0.3);">  # noqa: E501
-        <h2 style="margin-bottom: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">  # noqa: E501
+    <div style="text-align: center; padding: 3rem 1rem;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        border-radius: 20px; border: 2px solid rgba(102, 126, 234, 0.3);">
+        <h2 style="margin-bottom: 1rem;
+            color: #FFFFFF;
+            font-weight: 700;
+            text-shadow: 0 2px 10px rgba(102, 126, 234, 0.5);
+            font-size: 2rem;">
             Ready to Analyze Movie Reviews?
         </h2>
         <p style="color: #B0B0B0; font-size: 1.1rem; margin-bottom: 2rem;">
@@ -1152,12 +1337,17 @@ def main():
         </p>
         <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
             <a href="/Predict" target="_self" style="text-decoration: none;">
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.3s; display: inline-block;">  # noqa: E501
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white; padding: 1rem 2rem; border-radius: 12px; font-weight: 700;
+                    cursor: pointer; transition: all 0.3s; display: inline-block;">
                     🎯 Start Predicting
                 </div>
             </a>
             <a href="/Performance" target="_self" style="text-decoration: none;">
-                <div style="background: rgba(102, 126, 234, 0.2); color: #667eea; padding: 1rem 2rem; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.3s; display: inline-block; border: 2px solid #667eea;">  # noqa: E501
+                <div style="background: rgba(102, 126, 234, 0.2); color: #667eea;
+                    padding: 1rem 2rem; border-radius: 12px; font-weight: 700;
+                    cursor: pointer; transition: all 0.3s; display: inline-block;
+                    border: 2px solid #667eea;">
                     📊 View Performance
                 </div>
             </a>
@@ -1177,7 +1367,8 @@ def main():
         </p>
         <p style="font-size: 0.85rem; color: #555;">
             © 2024 Movie Sentiment Analysis |
-            <a href="https://github.com/habstrakT808/movie-sentiment-mlops" target="_blank" style="color: #667eea; text-decoration: none;">  # noqa: E501
+            <a href="https://github.com/habstrakT808/movie-sentiment-mlops" target="_blank"
+                style="color: #667eea; text-decoration: none;">
                 GitHub
             </a> |
             <a href="mailto:jhodywiraputra@gmail.com" style="color: #667eea; text-decoration: none;">

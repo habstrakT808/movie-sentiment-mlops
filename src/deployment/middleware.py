@@ -7,7 +7,13 @@ import time
 from typing import Callable
 
 from fastapi import Request, Response
-from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_latest
+from prometheus_client import (
+    CONTENT_TYPE_LATEST,
+    Counter,
+    Gauge,
+    Histogram,
+    generate_latest,
+)
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from src.utils.logger import get_logger
@@ -34,6 +40,18 @@ PREDICTION_DURATION = Histogram(
 )
 
 MODEL_ERRORS = Counter("model_errors_total", "Total model errors", ["error_type"])
+
+# Data Drift metrics
+DATA_DRIFT_SCORE = Gauge(
+    "data_drift_score",
+    "Data drift detection score (0-1)",
+    ["metric_type"],  # overall, text_length, word_count, sentiment
+)
+
+DATA_DRIFT_ALERT = Gauge(
+    "data_drift_alert",
+    "Data drift alert level (0=ok, 1=warning, 2=critical)",
+)
 
 
 class LoggingMiddleware(BaseHTTPMiddleware):
@@ -112,3 +130,40 @@ def get_metrics():
 def get_metrics_content_type():
     """Get Prometheus metrics content type."""
     return CONTENT_TYPE_LATEST
+
+
+def update_drift_metrics(drift_results: dict):
+    """
+    Update Prometheus drift metrics.
+
+    Args:
+        drift_results: Dict from DataDriftDetector.detect_drift()
+    """
+    try:
+        # Update drift scores
+        drift_scores = drift_results.get("drift_scores", {})
+
+        DATA_DRIFT_SCORE.labels(metric_type="overall").set(
+            drift_scores.get("overall", 0.0)
+        )
+        DATA_DRIFT_SCORE.labels(metric_type="text_length").set(
+            drift_scores.get("text_length", 0.0)
+        )
+        DATA_DRIFT_SCORE.labels(metric_type="word_count").set(
+            drift_scores.get("word_count", 0.0)
+        )
+        DATA_DRIFT_SCORE.labels(metric_type="sentiment").set(
+            drift_scores.get("sentiment", 0.0)
+        )
+
+        # Update alert level
+        alert_level = drift_results.get("alert_level", "ok")
+        alert_value = {"ok": 0, "warning": 1, "critical": 2}.get(alert_level, 0)
+        DATA_DRIFT_ALERT.set(alert_value)
+
+        logger.info(
+            f"Drift metrics updated: overall={drift_scores.get('overall', 0.0):.4f}, alert={alert_level}"
+        )
+
+    except Exception as e:
+        logger.error(f"Failed to update drift metrics: {e}")

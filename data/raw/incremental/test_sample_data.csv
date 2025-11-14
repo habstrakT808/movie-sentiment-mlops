@@ -1,0 +1,4 @@
+text,sentiment,hash,text_length,word_count,source_type
+This movie was amazing!,positive,hash1,25,5,reddit
+"Terrible movie, don't watch.",negative,hash2,30,6,reddit
+"Great film, highly recommend!",positive,hash3,28,5,kaggle

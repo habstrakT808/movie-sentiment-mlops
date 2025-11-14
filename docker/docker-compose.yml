@@ -24,8 +24,23 @@ services:
       - API_HOST=0.0.0.0
       - API_PORT=8000
       - PYTHONUNBUFFERED=1
+      - RETRAIN_THRESHOLD=${RETRAIN_THRESHOLD:-10}
+      - MIN_IMPROVEMENT=${MIN_IMPROVEMENT:-0.01}
+      - RETRAIN_INTERVAL_HOURS=${RETRAIN_INTERVAL_HOURS:-1}
+      - DATA_COLLECTION_INTERVAL_HOURS=${DATA_COLLECTION_INTERVAL_HOURS:-24} # Collect data daily
+      - DATA_COLLECTION_RETRAIN_THRESHOLD=${DATA_COLLECTION_RETRAIN_THRESHOLD:-3000} # Min new samples for retraining (recommended: 3000-5000)
     volumes:
       - ../logs:/app/logs
+      - ../src:/app/src:ro
+      - ../data:/app/data
+    # GPU support (uncomment if you have NVIDIA GPU and nvidia-container-toolkit installed)
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
@@ -104,6 +119,7 @@ services:
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
     restart: unless-stopped
     networks:
       - sentiment-network

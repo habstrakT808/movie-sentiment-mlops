@@ -62,6 +62,7 @@ RUN pip install --no-cache-dir --user \
     python-multipart==0.0.6 \
     prometheus-client==0.19.0 \
     psutil==5.9.6 \
+    apscheduler==3.10.4 \
     matplotlib==3.8.2 \
     seaborn==0.13.0 \
     plotly==5.18.0 \
@@ -130,6 +131,7 @@ RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
     python-multipart==0.0.6 \
     prometheus-client==0.19.0 \
     psutil==5.9.6 \
+    apscheduler==3.10.4 \
     pyyaml==6.0.1 \
     loguru==0.7.2 \
     python-dotenv==1.0.0

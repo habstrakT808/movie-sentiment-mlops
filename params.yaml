@@ -161,3 +161,11 @@ api:
     prometheus_enabled: true
     metrics_endpoint: "/metrics"
     log_requests: true
+
+# Periodic Data Collection (for Continuous Learning)
+periodic_collection:
+  interval_hours: 24  # Collect data every 24 hours
+  min_samples_per_source: 100  # Minimum samples from each source
+  time_filter: "week"  # Collect data from last week
+  retrain_threshold: 3000  # Minimum new samples to trigger retraining (recommended: 3000-5000 for production)
+  merge_with_existing: true  # Merge with existing training data
